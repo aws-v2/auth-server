@@ -14,7 +14,7 @@ RUN mvn dependency:go-offline -B
 # Copy source code
 COPY src ./src
 
-# Build the application (skip tests for faster builds, run tests in CI/CD)
+# Build the application (skip tests for faster builds, run tests in CI/CD)sdasda
 RUN mvn clean package -DskipTests -B
 
 # Stage 2: Runtime stage
