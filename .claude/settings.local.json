@@ -1,0 +1,15 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(mvnw.cmd compile:*)",
+      "Bash(./mvnw.cmd compile:*)",
+      "Bash(java:*)",
+      "Bash(echo:*)",
+      "Bash(JAVA_HOME=\"C:\\Program Files\\Common Files\\Oracle\\Java\\javapath\" ./mvnw.cmd:*)",
+      "Bash(dir:*)",
+      "Bash(findstr:*)"
+    ],
+    "deny": [],
+    "ask": []
+  }
+}

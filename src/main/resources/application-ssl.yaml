@@ -1,0 +1,24 @@
+# SSL/TLS Configuration for Production
+# This configuration should be used when deploying behind a load balancer with SSL termination
+# or when running with a valid SSL certificate
+
+server:
+  # Enable HTTPS
+  ssl:
+    enabled: ${SSL_ENABLED:false}
+    # Path to keystore file (can be .p12 or .jks)
+    key-store: ${SSL_KEYSTORE_PATH:classpath:keystore.p12}
+    key-store-password: ${SSL_KEYSTORE_PASSWORD:changeit}
+    key-store-type: ${SSL_KEYSTORE_TYPE:PKCS12}
+    key-alias: ${SSL_KEY_ALIAS:auth-server}
+    # Enable TLS 1.2 and 1.3 only
+    enabled-protocols: TLSv1.2,TLSv1.3
+  # Redirect HTTP to HTTPS
+  http2:
+    enabled: true
+
+# Security headers configuration
+spring:
+  security:
+    filter:
+      dispatcher-types: REQUEST, ERROR, ASYNC, FORWARD
