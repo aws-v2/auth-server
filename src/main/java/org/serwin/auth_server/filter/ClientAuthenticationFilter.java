@@ -4,7 +4,7 @@ import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
-import lombok.RequiredArgsConstructor;
+
 import lombok.extern.slf4j.Slf4j;
 import org.serwin.auth_server.entities.Client;
 import org.serwin.auth_server.repository.ClientRepository;
@@ -24,12 +24,17 @@ import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Component
-@RequiredArgsConstructor
 @Slf4j
 public class ClientAuthenticationFilter extends OncePerRequestFilter {
 
     private final ClientRepository clientRepository;
     private final PasswordEncoder passwordEncoder;
+
+    public ClientAuthenticationFilter(ClientRepository clientRepository,
+            @org.springframework.context.annotation.Lazy PasswordEncoder passwordEncoder) {
+        this.clientRepository = clientRepository;
+        this.passwordEncoder = passwordEncoder;
+    }
 
     @Override
     protected void doFilterInternal(
