@@ -1,5 +1,6 @@
 spring:
-  application-name: auth-service
+  application:
+    name: auth-service
   jpa:
     properties:
       hibernate:
@@ -60,7 +61,7 @@ logging:
     max-history: 30
 
 jwt:
-  secret: ${PROD_JWT_SECRET}
+  secret: ${PROD_JWT_SECRET:"somesecret"}
   expiration: ${JWT_SECRET_EXPIRATION:86400000}
 
 server:
@@ -100,3 +101,21 @@ management:
     metrics:
       export:
         enabled: true
+
+# Eureka client configuration for production
+eureka:
+  client:
+    service-url:
+      defaultZone: ${EUREKA_SERVER_URL:https://discovery-server-latest-6p1n.onrender.com/eureka/}
+    register-with-eureka: true
+    fetch-registry: true
+  instance:
+    prefer-ip-address: false
+    hostname: ${RENDER_EXTERNAL_HOSTNAME:auth-service.onrender.com}
+    instance-id: ${spring.application.name}:${RENDER_EXTERNAL_HOSTNAME:auth-service.onrender.com}
+    non-secure-port-enabled: false
+    secure-port-enabled: true
+    secure-port: 443
+    home-page-url: https://${RENDER_EXTERNAL_HOSTNAME:auth-service.onrender.com}
+    status-page-url: https://${RENDER_EXTERNAL_HOSTNAME:auth-service.onrender.com}/actuator/info
+    health-check-url: https://${RENDER_EXTERNAL_HOSTNAME:auth-service.onrender.com}/actuator/health
