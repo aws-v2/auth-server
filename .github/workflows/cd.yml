@@ -25,4 +25,4 @@ jobs:
       with:
         context: .
         push: true
-        tags: emqarani3/auth-server:latest
+        tags: emqarani/auth-server:latest
