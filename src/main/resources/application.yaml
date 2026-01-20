@@ -4,11 +4,11 @@ spring:
     properties:
       hibernate:
         dialect: org.hibernate.dialect.PostgreSQLDialect
-        format_sql: 'true'
-    show-sql: 'true'
+        format_sql: "true"
+    show-sql: "true"
     hibernate:
       ddl-auto: update
-    open-in-view: false  # Disable to remove the warning
+    open-in-view: false # Disable to remove the warning
     flyway:
       baseline-on-migrate: true
       baseline-version: 0
@@ -17,19 +17,8 @@ spring:
     password: ${DEV_DATASOURCE_PASSWORD:npg_FUvQyuo8M9Kc}
     driver-class-name: org.postgresql.Driver
     username: ${DEV_DATASOURCE_USERNAME:neondb_owner}
-    # url: ${DEV_DATASOURCE_URL:jdbc:postgresql://localhost:5432}/auth_db_dev
-    url: jdbc:postgresql://ep-sparkling-dust-a4zga52i-pooler.us-east-1.aws.neon.tech/serwin-auth-db?sslmode=require&channel_binding=require
-
-
-
-
-
-
-
-
-
-
-
+    url: ${DEV_DATASOURCE_URL:jdbc:postgresql://localhost:5432}/auth_db_dev
+    # url: jdbc:postgresql://ep-sparkling-dust-a4zga52i-pooler.us-east-1.aws.neon.tech/serwin-auth-db?sslmode=require&channel_binding=require
 
   mail:
     host: ${DEV_MAIL_HOST:smtp.gmail.com}
@@ -88,26 +77,6 @@ app:
   frontend:
     url: ${DEV_FRONTEND_URL:http://localhost:5173}
 
-eureka:
-  instance:
-    hostname: localhost
-    instance-id: ${spring.application.name}:${server.port}
-    prefer-ip-address: true
-    ip-address: 127.0.0.1
-    status-page-url: ${DEV_EUREKA_SCHEME:http}://${DEV_EUREKA_HOSTNAME:localhost}:${server.port}/actuator/info
-    health-check-url: ${DEV_EUREKA_SCHEME:http}://${DEV_EUREKA_HOSTNAME:localhost}:${server.port}/actuator/health
-    lease-renewal-interval-in-seconds: 10
-    lease-expiration-duration-in-seconds: 40
-  client:
-    enabled: ${EUREKA_ENABLED:true}
-    service-url:
-      defaultZone: ${DEV_EUREKA_SCHEME:http}://${DEV_EUREKA_HOSTNAME:localhost}:8761/eureka/
-    register-with-eureka: ${EUREKA_ENABLED:true}
-    fetch-registry: ${EUREKA_ENABLED:true}
-    registry-fetch-interval-seconds: 30
-    initial-instance-info-replication-interval-seconds: 10
-    eureka-service-url-poll-interval-seconds: 30
-
 # NATS Configuration
 nats:
   url: ${DEV_NATS_URL:nats://localhost:4222}
@@ -117,7 +86,7 @@ nats:
 # Scheduled tasks
 scheduled:
   token-cleanup:
-    cron: "0 0 * * * *"  # Every hour
+    cron: "0 0 * * * *" # Every hour
 
 # Add actuator endpoints for health checks
 management:

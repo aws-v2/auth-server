@@ -6,7 +6,6 @@ import org.serwin.auth_server.dto.ApiKeyResponse;
 import org.serwin.auth_server.dto.CreateApiKeyRequest;
 import org.serwin.auth_server.service.ApiKeyService;
 import org.serwin.auth_server.service.NatsService;
-import org.springframework.cloud.context.config.annotation.RefreshScope;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
@@ -22,7 +21,6 @@ import java.util.UUID;
 @RequestMapping("/auth/api-keys")
 @RequiredArgsConstructor
 @Slf4j
-@RefreshScope
 public class ApiKeyController {
 
     private final ApiKeyService apiKeyService;
