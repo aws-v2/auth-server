@@ -1,5 +1,5 @@
 ### Variables
-@baseUrl = http://localhost:8081
+@baseUrl = https://auth-server-latest-mtnb.onrender.com
 @contentType = application/json
 
 ###############################################
@@ -11,8 +11,8 @@ POST {{baseUrl}}/api/v1/auth/register
 Content-Type: {{contentType}}
 
 {
-  "username": "testuser",
-  "email": "testuser@example.com",
+  "username": "testquse2r",
+  "email": "emqarani2@gmail.com",
   "password": "SecurePassword123!",
   "confirmPassword": "SecurePassword123!"
 }

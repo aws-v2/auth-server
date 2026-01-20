@@ -60,7 +60,7 @@ logging:
     max-history: 30
 
 jwt:
-  secret: ${PROD_JWT_SECRET}
+  secret: ${PROD_JWT_SECRET:"somesecret"}
   expiration: ${JWT_SECRET_EXPIRATION:86400000}
 
 server:
@@ -100,3 +100,21 @@ management:
     metrics:
       export:
         enabled: true
+
+# Eureka client configuration for production
+eureka:
+  client:
+    service-url:
+      defaultZone: ${EUREKA_SERVER_URL:https://discovery-server-latest-6p1n.onrender.com/eureka/}
+    register-with-eureka: true
+    fetch-registry: true
+  instance:
+    prefer-ip-address: false
+    hostname: ${EUREKA_INSTANCE_HOSTNAME:${RENDER_EXTERNAL_HOSTNAME:auth-service}}
+    instance-id: ${EUREKA_INSTANCE_HOSTNAME:${RENDER_EXTERNAL_HOSTNAME:auth-service}}:${server.port}
+    non-secure-port-enabled: false
+    secure-port-enabled: true
+    secure-port: ${server.port}
+    home-page-url: ${EUREKA_INSTANCE_HOME_PAGE_URL:https://${RENDER_EXTERNAL_HOSTNAME:auth-service}.onrender.com}
+    status-page-url: ${EUREKA_INSTANCE_STATUS_PAGE_URL:https://${RENDER_EXTERNAL_HOSTNAME:auth-service}.onrender.com/actuator/info}
+    health-check-url: ${EUREKA_INSTANCE_HEALTH_CHECK_URL:https://${RENDER_EXTERNAL_HOSTNAME:auth-service}.onrender.com/actuator/health}
