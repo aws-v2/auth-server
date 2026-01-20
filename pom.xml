@@ -212,17 +212,7 @@
             <version>8.7.0</version>
         </dependency>
 
-        <!-- Redis for distributed rate limiting -->
-        <dependency>
-            <groupId>org.springframework.boot</groupId>
-            <artifactId>spring-boot-starter-data-redis</artifactId>
-        </dependency>
 
-        <!-- Lettuce Redis Client -->
-        <dependency>
-            <groupId>io.lettuce</groupId>
-            <artifactId>lettuce-core</artifactId>
-        </dependency>
 
         <!-- Caffeine Cache (for local rate limiting fallback) -->
         <dependency>

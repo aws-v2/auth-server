@@ -130,24 +130,6 @@ services:
       start_period: 60s
     restart: unless-stopped
 
-  # Redis for Rate Limiting
-  redis:
-    image: redis:7-alpine
-    container_name: auth-redis
-    command: redis-server --requirepass redis-password
-    ports:
-      - "6379:6379"
-    volumes:
-      - redis-data:/data
-    networks:
-      - auth-network
-    healthcheck:
-      test: ["CMD", "redis-cli", "--raw", "incr", "ping"]
-      interval: 10s
-      timeout: 5s
-      retries: 5
-    restart: unless-stopped
-
 networks:
   auth-network:
     driver: bridge
@@ -156,6 +138,4 @@ volumes:
   postgres-data:
     driver: local
   nats-data:
-    driver: local
-  redis-data:
     driver: local

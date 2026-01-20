@@ -33,14 +33,12 @@ Complete orchestration with:
 - **PostgreSQL 15**: Database with health checks
 - **NATS 2.10**: Message broker with JetStream
 - **Eureka**: Service discovery
-- **Redis 7**: For distributed rate limiting
 - **Auth Server**: Application with all dependencies
 - **Networks & Volumes**: Proper isolation and data persistence
 
 ### 4. Rate Limiting ✅
 - **Dependencies Added**:
   - Bucket4j for rate limiting
-  - Redis for distributed storage
   - Caffeine for local caching
 
 - **Rate Limit Configuration**:
@@ -142,7 +140,7 @@ curl http://localhost:8081/actuator/health
 ### Option 2: Local Development
 ```bash
 # 1. Start dependencies
-docker-compose up -d postgres nats eureka redis
+docker-compose up -d postgres nats eureka
 
 # 2. Run application
 ./mvnw spring-boot:run
@@ -268,10 +266,7 @@ docker-compose logs auth-server
 docker-compose exec postgres psql -U root -d auth_db_dev -c "SELECT 1"
 ```
 
-### Check rate limiting:
-```bash
-docker-compose exec redis redis-cli -a redis-password ping
-```
+
 
 ### View audit logs:
 ```bash

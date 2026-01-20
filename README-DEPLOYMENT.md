@@ -47,7 +47,6 @@ docker-compose down -v
 - **PostgreSQL**: localhost:5432
 - **NATS**: localhost:4222 (client), localhost:8222 (monitoring)
 - **Eureka**: http://localhost:8761
-- **Redis**: localhost:6379
 
 ### 4. Health Check
 
@@ -217,9 +216,7 @@ The application includes rate limiting on authentication endpoints:
 - **MFA endpoints**: 5 requests/minute per IP
 - **API endpoints**: 100 requests/minute per user
 
-Rate limits are stored in:
-- **Development**: In-memory cache (Caffeine)
-- **Production**: Redis (configure in docker-compose or separately)
+Rate limits are stored in in-memory cache (Caffeine).
 
 ## Monitoring
 
@@ -290,16 +287,6 @@ docker-compose ps postgres
 docker-compose logs postgres
 
 # Verify connection string in .env file
-```
-
-### Rate limiting not working
-
-```bash
-# Check Redis is running
-docker-compose ps redis
-
-# Verify Redis connection
-docker-compose exec redis redis-cli -a redis-password ping
 ```
 
 ## Performance Tuning
