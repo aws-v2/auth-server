@@ -17,8 +17,8 @@ spring:
     password: ${DEV_DATASOURCE_PASSWORD:npg_FUvQyuo8M9Kc}
     driver-class-name: org.postgresql.Driver
     username: ${DEV_DATASOURCE_USERNAME:neondb_owner}
-    # url: ${DEV_DATASOURCE_URL:jdbc:postgresql://localhost:5432}/auth_db_dev
-    url: jdbc:postgresql://ep-sparkling-dust-a4zga52i-pooler.us-east-1.aws.neon.tech/serwin-auth-db?sslmode=require&channel_binding=require
+    url: ${DEV_DATASOURCE_URL:jdbc:postgresql://localhost:5432}/auth_db_dev
+    # url: jdbc:postgresql://ep-sparkling-dust-a4zga52i-pooler.us-east-1.aws.neon.tech/serwin-auth-db?sslmode=require&channel_binding=require
 
   mail:
     host: ${DEV_MAIL_HOST:smtp.gmail.com}
