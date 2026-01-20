@@ -1,0 +1,102 @@
+spring:
+  application-name: auth-service
+  jpa:
+    properties:
+      hibernate:
+        dialect: org.hibernate.dialect.PostgreSQLDialect
+        format_sql: "false"
+    show-sql: "false"
+    hibernate:
+      ddl-auto: validate
+    open-in-view: false
+    flyway:
+      baseline-on-migrate: true
+      baseline-version: 0
+
+  datasource:
+    password: ${PROD_DATASOURCE_PASSWORD}
+    driver-class-name: org.postgresql.Driver
+    username: ${PROD_DATASOURCE_USERNAME}
+    url: ${PROD_DATASOURCE_URL}
+    hikari:
+      maximum-pool-size: 20
+      minimum-idle: 5
+      connection-timeout: 30000
+      idle-timeout: 600000
+      max-lifetime: 1800000
+
+  mail:
+    host: ${PROD_MAIL_HOST:smtp.gmail.com}
+    port: ${PROD_MAIL_PORT:587}
+    username: ${PROD_MAIL_USERNAME}
+    password: ${PROD_MAIL_PASSWORD}
+    properties:
+      mail:
+        smtp:
+          auth: true
+          starttls:
+            enable: true
+
+  # Graceful shutdown configuration
+  lifecycle:
+    timeout-per-shutdown-phase: 30s
+
+logging:
+  level:
+    root: INFO
+    org:
+      serwin:
+        auth_server: INFO
+      springframework:
+        security: WARN
+        web: WARN
+    # Audit logger
+    AUDIT: INFO
+  pattern:
+    console: "%d{yyyy-MM-dd HH:mm:ss.SSS} [%thread] %-5level %logger{36} - %msg%n"
+  file:
+    name: logs/auth-server-prod.log
+    max-size: 50MB
+    max-history: 30
+
+jwt:
+  secret: ${PROD_JWT_SECRET}
+  expiration: ${JWT_SECRET_EXPIRATION:86400000}
+
+server:
+  port: ${AUTH_SERVICE_PORT:8081}
+  # Graceful shutdown
+  shutdown: graceful
+  # Compression
+  compression:
+    enabled: true
+    mime-types: application/json,application/xml,text/html,text/xml,text/plain
+
+app:
+  frontend:
+    url: ${PROD_FRONTEND_URL}
+
+# NATS Configuration
+nats:
+  url: ${PROD_NATS_URL}
+  username: ${PROD_NATS_USERNAME}
+  password: ${PROD_NATS_PASSWORD}
+
+# Scheduled tasks
+scheduled:
+  token-cleanup:
+    cron: "0 0 * * * *" # Every hour
+
+# Add actuator endpoints for health checks
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info,metrics,prometheus
+  endpoint:
+    health:
+      show-details: when-authorized
+  prometheus:
+    metrics:
+      export:
+        enabled: true

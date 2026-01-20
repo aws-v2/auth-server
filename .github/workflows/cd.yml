@@ -26,3 +26,5 @@ jobs:
         context: .
         push: true
         tags: qarani/auth-server:latest
+        build-args: |
+          SPRING_PROFILES_ACTIVE=prod
