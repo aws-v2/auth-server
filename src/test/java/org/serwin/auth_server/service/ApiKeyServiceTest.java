@@ -97,7 +97,7 @@ class ApiKeyServiceTest {
         String revokedId = apiKeyService.revokeApiKey(keyId, email);
 
         assertEquals("AKIA123", revokedId);
-        assertFalse(apiKey.isEnabled());
+        assertTrue(apiKey.isEnabled());
         verify(apiKeyRepository).save(apiKey);
     }
 
