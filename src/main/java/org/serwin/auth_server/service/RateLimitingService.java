@@ -26,7 +26,7 @@ public class RateLimitingService {
     public boolean isAllowed(String key, BucketType bucketType) {
         Cache cache = cacheManager.getCache("rateLimitBuckets");
         if (cache == null) {
-            log.warn("Rate limit cache not available, allowing request");
+            log.warn("Rate limit cache not available, allowing request to go one ");
             return true;
         }
 
