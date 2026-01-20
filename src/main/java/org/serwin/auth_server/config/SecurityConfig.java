@@ -43,8 +43,10 @@ public class SecurityConfig {
                 .cors(AbstractHttpConfigurer::disable) // Disabled - CORS handled by API Gateway
                 .csrf(AbstractHttpConfigurer::disable)
                 .authorizeHttpRequests(auth -> auth
-                        .requestMatchers("/auth/register", "/auth/login", "/auth/mfa/verify", "/auth/forgot-password",
-                                "/auth/reset-password", "/auth/verify-email", "/auth/resend-verification",
+                        .requestMatchers("/api/v1/auth/register", "/api/v1/auth/login", "/api/v1/auth/mfa/verify",
+                                "/api/v1/auth/forgot-password",
+                                "/api/v1/auth/reset-password", "/api/v1/auth/verify-email",
+                                "/api/v1/auth/resend-verification",
                                 "/actuator/health", "/actuator/info")
                         .permitAll()
                         .anyRequest().authenticated())
