@@ -25,7 +25,7 @@ RUN apk add --no-cache curl
 
 # Create non-root user for security
 RUN addgroup -g 1001 -S appgroup && \
-    adduser -u 1001 -S appuser -G appgroup
+  adduser -u 1001 -S appuser -G appgroup
 
 # Set working directory
 WORKDIR /app
@@ -35,13 +35,17 @@ COPY --from=build /app/target/*.jar app.jar
 
 # Create logs directory with proper permissions
 RUN mkdir -p /app/logs && \
-    chown -R appuser:appgroup /app
+  chown -R appuser:appgroup /app
 
 # Switch to non-root user
 USER appuser
 
 # Expose port
 EXPOSE 8081
+
+# Accept Spring profile as build argument (defaults to dev)
+ARG SPRING_PROFILES_ACTIVE=dev
+ENV SPRING_PROFILES_ACTIVE=$SPRING_PROFILES_ACTIVE
 
 # Set JVM options
 ENV JAVA_OPTS="-Xms512m -Xmx1024m -XX:+UseG1GC -XX:MaxGCPauseMillis=200 -XX:+HeapDumpOnOutOfMemoryError -XX:HeapDumpPath=/app/logs/heap-dump.hprof"

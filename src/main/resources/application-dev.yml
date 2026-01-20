@@ -1,0 +1,68 @@
+spring:
+  jpa:
+    properties:
+      hibernate:
+        dialect: org.hibernate.dialect.PostgreSQLDialect
+        format_sql: "true"
+    show-sql: "true"
+    hibernate:
+      ddl-auto: update
+    flyway:
+      baseline-on-migrate: true
+      baseline-version: 0
+
+  datasource:
+    password: ${DEV_DATASOURCE_PASSWORD:root}
+    driver-class-name: org.postgresql.Driver
+    username: ${DEV_DATASOURCE_USERNAME:root}
+    url: ${DEV_DATASOURCE_URL:jdbc:postgresql://localhost:5432/auth_db_dev}
+
+  mail:
+    host: ${DEV_MAIL_HOST:smtp.gmail.com}
+    port: ${DEV_MAIL_PORT:587}
+    username: ${DEV_MAIL_USERNAME:}
+    password: ${DEV_MAIL_PASSWORD:}
+    properties:
+      mail:
+        smtp:
+          auth: true
+          starttls:
+            enable: true
+
+logging:
+  level:
+    root: INFO
+    org:
+      serwin:
+        auth_server: DEBUG
+      springframework:
+        security: DEBUG
+        web: DEBUG
+    # Audit logger
+    AUDIT: INFO
+  pattern:
+    console: "%d{yyyy-MM-dd HH:mm:ss.SSS} [%thread] %highlight(%-5level) %cyan(%logger{36}) - %msg%n"
+  file:
+    name: logs/auth-server-dev.log
+    max-size: 10MB
+    max-history: 7
+
+jwt:
+  secret: ${DEV_JWT_SECRET:404E635266556A586E3272357538782F413F4428472B4B6250645367566B5970404E635266556A586E3272357538782F413F4428472B4B6250645367566B5970}
+  expiration: ${JWT_SECRET_EXPIRATION:86400000}
+
+app:
+  frontend:
+    url: ${DEV_FRONTEND_URL:http://localhost:5173}
+
+# NATS Configuration
+nats:
+  url: ${DEV_NATS_URL:nats://localhost:4222}
+  username: ${DEV_NATS_USERNAME:auth-server}
+  password: ${DEV_NATS_PASSWORD:auth-secret}
+
+# Add actuator endpoints for health checks
+management:
+  endpoint:
+    health:
+      show-details: always
