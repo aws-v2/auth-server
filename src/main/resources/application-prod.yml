@@ -1,5 +1,6 @@
 spring:
-  application-name: auth-service
+  application:
+    name: auth-service
   jpa:
     properties:
       hibernate:
@@ -110,11 +111,11 @@ eureka:
     fetch-registry: true
   instance:
     prefer-ip-address: false
-    hostname: ${EUREKA_INSTANCE_HOSTNAME:${RENDER_EXTERNAL_HOSTNAME:auth-service}}
-    instance-id: ${EUREKA_INSTANCE_HOSTNAME:${RENDER_EXTERNAL_HOSTNAME:auth-service}}:${server.port}
+    hostname: ${RENDER_EXTERNAL_HOSTNAME:auth-service.onrender.com}
+    instance-id: ${spring.application.name}:${RENDER_EXTERNAL_HOSTNAME:auth-service.onrender.com}
     non-secure-port-enabled: false
     secure-port-enabled: true
-    secure-port: ${server.port}
-    home-page-url: ${EUREKA_INSTANCE_HOME_PAGE_URL:https://${RENDER_EXTERNAL_HOSTNAME:auth-service}.onrender.com}
-    status-page-url: ${EUREKA_INSTANCE_STATUS_PAGE_URL:https://${RENDER_EXTERNAL_HOSTNAME:auth-service}.onrender.com/actuator/info}
-    health-check-url: ${EUREKA_INSTANCE_HEALTH_CHECK_URL:https://${RENDER_EXTERNAL_HOSTNAME:auth-service}.onrender.com/actuator/health}
+    secure-port: 443
+    home-page-url: https://${RENDER_EXTERNAL_HOSTNAME:auth-service.onrender.com}
+    status-page-url: https://${RENDER_EXTERNAL_HOSTNAME:auth-service.onrender.com}/actuator/info
+    health-check-url: https://${RENDER_EXTERNAL_HOSTNAME:auth-service.onrender.com}/actuator/health
