@@ -20,8 +20,8 @@ spring:
   mail:
     host: ${DEV_MAIL_HOST:smtp.gmail.com}
     port: ${DEV_MAIL_PORT:587}
-    username: ${DEV_MAIL_USERNAME:}
-    password: ${DEV_MAIL_PASSWORD:}
+    username: ${DEV_MAIL_USERNAME:emqarani@gmail.com}
+    password: ${DEV_MAIL_PASSWORD:cbhs oyci khfa psij}
     properties:
       mail:
         smtp:
