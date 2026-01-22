@@ -51,6 +51,7 @@ jobs:
           username: ${{ secrets.EC2_USERNAME }}
           key: ${{ secrets.EC2_SSH_KEY }}
           script: |
+            echo "${{ secrets.AUTH_SERVER_PROD_ENV }}" > /home/${{ secrets.EC2_USERNAME }}/.auth-server-prod.env
             docker pull qarani/auth-server:latest
             docker stop auth-server || true
             docker rm auth-server || true
