@@ -106,16 +106,11 @@ management:
 eureka:
   client:
     service-url:
-      defaultZone: ${EUREKA_SERVER_URL:https://discovery-server-latest-6p1n.onrender.com/eureka/}
+      defaultZone: ${EUREKA_SERVER_URL:http://discovery-server:8761/eureka}
     register-with-eureka: true
     fetch-registry: true
   instance:
-    prefer-ip-address: false
-    hostname: ${RENDER_EXTERNAL_HOSTNAME:auth-service.onrender.com}
-    instance-id: ${spring.application.name}:${RENDER_EXTERNAL_HOSTNAME:auth-service.onrender.com}
-    non-secure-port-enabled: false
-    secure-port-enabled: true
-    secure-port: 443
-    home-page-url: https://${RENDER_EXTERNAL_HOSTNAME:auth-service.onrender.com}
-    status-page-url: https://${RENDER_EXTERNAL_HOSTNAME:auth-service.onrender.com}/actuator/info
-    health-check-url: https://${RENDER_EXTERNAL_HOSTNAME:auth-service.onrender.com}/actuator/health
+    prefer-ip-address: true
+    instance-id: ${spring.application.name}:${spring.cloud.client.ip-address}:${server.port}
+    lease-renewal-interval-in-seconds: 30
+    lease-expiration-duration-in-seconds: 90
