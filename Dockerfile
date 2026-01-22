@@ -44,7 +44,7 @@ USER appuser
 EXPOSE 8081
 
 # Accept Spring profile as build argument (defaults to dev)
-ARG SPRING_PROFILES_ACTIVE=dev
+ARG SPRING_PROFILES_ACTIVE=prod
 ENV SPRING_PROFILES_ACTIVE=$SPRING_PROFILES_ACTIVE
 
 # Set JVM options

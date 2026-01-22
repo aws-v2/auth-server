@@ -15,10 +15,10 @@ spring:
       baseline-version: 0
 
   datasource:
-    password: ${PROD_DATASOURCE_PASSWORD}
+    password: ${PROD_DATASOURCE_PASSWORD:npg_FUvQyuo8M9Kc}
     driver-class-name: org.postgresql.Driver
-    username: ${PROD_DATASOURCE_USERNAME}
-    url: ${PROD_DATASOURCE_URL}
+    username: ${PROD_DATASOURCE_USERNAME:neondb_owner}
+    url: ${PROD_DATASOURCE_URL:jdbc:postgresql://ep-sparkling-dust-a4zga52i-pooler.us-east-1.aws.neon.tech/serwin-auth-db?sslmode=require}
     hikari:
       maximum-pool-size: 20
       minimum-idle: 5
