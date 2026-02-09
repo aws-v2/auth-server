@@ -18,7 +18,7 @@ import java.util.Map;
 import java.util.UUID;
 
 @RestController
-@RequestMapping("/auth/api-keys")
+@RequestMapping("/api/v1/auth/api-keys")
 @RequiredArgsConstructor
 @Slf4j
 public class ApiKeyController {
@@ -64,7 +64,7 @@ public class ApiKeyController {
     }
 
     @DeleteMapping("/{keyId}")
-    public ResponseEntity<?> revokeApiKey(@PathVariable String keyId) {
+    public ResponseEntity<?> revokeApiKey(@PathVariable(value = "keyId") String keyId) {
         log.info("API key revocation request for keyId: {}", keyId);
         try {
             String email = getCurrentUserEmail();

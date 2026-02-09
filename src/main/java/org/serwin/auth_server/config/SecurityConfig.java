@@ -42,11 +42,29 @@ public class SecurityConfig {
         http
                 .csrf(AbstractHttpConfigurer::disable)
                 .authorizeHttpRequests(auth -> auth
-                        .requestMatchers("/api/v1/auth/register", "/api/v1/auth/login", "/api/v1/auth/mfa/verify",
-                                "/api/v1/auth/forgot-password",
-                                "/api/v1/auth/reset-password", "/api/v1/auth/verify-email",
-                                "/api/v1/auth/resend-verification",
-                                "/actuator/health", "/actuator/info")
+                        .requestMatchers(new org.springframework.security.web.util.matcher.AntPathRequestMatcher(
+                                "/api/v1/auth/register"))
+                        .permitAll()
+                        .requestMatchers(new org.springframework.security.web.util.matcher.AntPathRequestMatcher(
+                                "/api/v1/auth/login"))
+                        .permitAll()
+                        .requestMatchers(new org.springframework.security.web.util.matcher.AntPathRequestMatcher(
+                                "/api/v1/auth/mfa/verify"))
+                        .permitAll()
+                        .requestMatchers(new org.springframework.security.web.util.matcher.AntPathRequestMatcher(
+                                "/api/v1/auth/forgot-password"))
+                        .permitAll()
+                        .requestMatchers(new org.springframework.security.web.util.matcher.AntPathRequestMatcher(
+                                "/api/v1/auth/reset-password"))
+                        .permitAll()
+                        .requestMatchers(new org.springframework.security.web.util.matcher.AntPathRequestMatcher(
+                                "/api/v1/auth/verify-email"))
+                        .permitAll()
+                        .requestMatchers(new org.springframework.security.web.util.matcher.AntPathRequestMatcher(
+                                "/api/v1/auth/resend-verification"))
+                        .permitAll()
+                        .requestMatchers(
+                                new org.springframework.security.web.util.matcher.AntPathRequestMatcher("/actuator/**"))
                         .permitAll()
                         .anyRequest().authenticated())
                 .sessionManagement(session -> session
@@ -58,8 +76,6 @@ public class SecurityConfig {
 
         return http.build();
     }
-
-
 
     // CORS configuration now enabled locally for development
     // In production with API Gateway, this might need adjustment or profile-based
