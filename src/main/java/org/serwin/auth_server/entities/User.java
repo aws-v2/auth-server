@@ -38,75 +38,14 @@ public class User {
     @Column(name = "verification_token")
     private String verificationToken;
 
+    @Column(name = "enabled")
+    private boolean enabled = true;
+
     @Column(name = "created_at")
     private java.time.LocalDateTime createdAt;
 
     @PrePersist
     protected void onCreate() {
         createdAt = java.time.LocalDateTime.now();
-    }
-
-    public UUID getId() {
-        return id;
-    }
-
-    public void setId(UUID id) {
-        this.id = id;
-    }
-
-    public String getEmail() {
-        return email;
-    }
-
-    public void setEmail(String email) {
-        this.email = email;
-    }
-
-    public String getPassword() {
-        return password;
-    }
-
-    public void setPassword(String password) {
-        this.password = password;
-    }
-
-    public boolean isMfaEnabled() {
-        return mfaEnabled;
-    }
-
-    public void setMfaEnabled(boolean mfaEnabled) {
-        this.mfaEnabled = mfaEnabled;
-    }
-
-    public String getMfaSecret() {
-        return mfaSecret;
-    }
-
-    public void setMfaSecret(String mfaSecret) {
-        this.mfaSecret = mfaSecret;
-    }
-
-    public boolean isEmailVerified() {
-        return emailVerified;
-    }
-
-    public void setEmailVerified(boolean emailVerified) {
-        this.emailVerified = emailVerified;
-    }
-
-    public String getVerificationToken() {
-        return verificationToken;
-    }
-
-    public void setVerificationToken(String verificationToken) {
-        this.verificationToken = verificationToken;
-    }
-
-    public java.time.LocalDateTime getCreatedAt() {
-        return createdAt;
-    }
-
-    public void setCreatedAt(java.time.LocalDateTime createdAt) {
-        this.createdAt = createdAt;
     }
 }

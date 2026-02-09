@@ -35,10 +35,10 @@ public class ApiKey {
     @Column
     private String description;
 
-    @Column(name = "allowed_actions", columnDefinition = "text[]")
+    @Column(name = "allowed_actions", columnDefinition = "text ARRAY")
     private String[] allowedActions;
 
-    @Column(name = "allowed_resources", columnDefinition = "text[]")
+    @Column(name = "allowed_resources", columnDefinition = "text ARRAY")
     private String[] allowedResources;
 
     @Column(nullable = false)

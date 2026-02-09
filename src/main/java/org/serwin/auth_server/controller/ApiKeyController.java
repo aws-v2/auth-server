@@ -18,7 +18,7 @@ import java.util.Map;
 import java.util.UUID;
 
 @RestController
-@RequestMapping("/auth/api-keys")
+@RequestMapping("/api/v1/auth/api-keys")
 @RequiredArgsConstructor
 @Slf4j
 public class ApiKeyController {
@@ -33,8 +33,8 @@ public class ApiKeyController {
             String email = getCurrentUserEmail();
             ApiKeyResponse response = apiKeyService.generateApiKey(email, request);
 
-            // Publish event
-            natsService.publish("auth.apikey.created", Map.of(
+            // Publish event: apikey.created
+            natsService.publish("apikey", "created", Map.of(
                     "email", email,
                     "accessKeyId", response.getAccessKeyId(),
                     "keyName", request.getName(),
@@ -64,14 +64,14 @@ public class ApiKeyController {
     }
 
     @DeleteMapping("/{keyId}")
-    public ResponseEntity<?> revokeApiKey(@PathVariable String keyId) {
+    public ResponseEntity<?> revokeApiKey(@PathVariable(value = "keyId") String keyId) {
         log.info("API key revocation request for keyId: {}", keyId);
         try {
             String email = getCurrentUserEmail();
             String accessKeyId = apiKeyService.revokeApiKey(UUID.fromString(keyId), email);
 
-            // Publish event
-            natsService.publish("auth.apikey.revoked", Map.of(
+            // Publish event: apikey.revoked
+            natsService.publish("apikey", "revoked", Map.of(
                     "email", email,
                     "accessKeyId", accessKeyId,
                     "keyId", keyId,
