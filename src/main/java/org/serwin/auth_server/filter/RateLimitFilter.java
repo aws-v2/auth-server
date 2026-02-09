@@ -55,8 +55,7 @@ public class RateLimitFilter extends OncePerRequestFilter {
                 Map<String, Object> errorResponse = Map.of(
                         "error", "Rate limit exceeded",
                         "message", "Too many requests. Please try again later.",
-                        "status", HttpStatus.TOO_MANY_REQUESTS.value()
-                );
+                        "status", HttpStatus.TOO_MANY_REQUESTS.value());
 
                 response.getWriter().write(objectMapper.writeValueAsString(errorResponse));
                 return;
@@ -68,25 +67,25 @@ public class RateLimitFilter extends OncePerRequestFilter {
 
     private RateLimitingService.BucketType determineBucketType(String path) {
         // Authentication endpoints - strict rate limiting
-        if (path.startsWith("/auth/login") ||
-                path.startsWith("/auth/register") ||
-                path.startsWith("/auth/forgot-password") ||
-                path.startsWith("/auth/reset-password")) {
+        if (path.startsWith("/api/v1/auth/login") ||
+                path.startsWith("/api/v1/auth/register") ||
+                path.startsWith("/api/v1/auth/forgot-password") ||
+                path.startsWith("/api/v1/auth/reset-password")) {
             return RateLimitingService.BucketType.AUTH;
         }
 
         // MFA endpoints - very strict rate limiting
-        if (path.startsWith("/auth/mfa/")) {
+        if (path.startsWith("/api/v1/auth/mfa/")) {
             return RateLimitingService.BucketType.STRICT;
         }
 
         // API key operations - strict rate limiting
-        if (path.startsWith("/auth/api-keys")) {
+        if (path.startsWith("/api/v1/auth/api-keys")) {
             return RateLimitingService.BucketType.STRICT;
         }
 
         // Other authenticated endpoints
-        if (path.startsWith("/auth/")) {
+        if (path.startsWith("/api/v1/auth/")) {
             return RateLimitingService.BucketType.API;
         }
 

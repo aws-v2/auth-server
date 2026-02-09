@@ -15,7 +15,7 @@ spring:
     password: ${DEV_DATASOURCE_PASSWORD:root}
     driver-class-name: org.postgresql.Driver
     username: ${DEV_DATASOURCE_USERNAME:root}
-    url: ${DEV_DATASOURCE_URL:jdbc:postgresql://localhost:5432/auth_db_dev}
+    url: ${DEV_DATASOURCE_URL:jdbc:postgresql://localhost:5432/serwin_auth_db_dev}
 
   mail:
     host: ${DEV_MAIL_HOST:smtp.gmail.com}
@@ -27,7 +27,7 @@ spring:
         smtp:
           auth: true
           starttls:
-            enable: true
+            enable: true 
 
 logging:
   level:
