@@ -7,6 +7,7 @@ spring:
     show-sql: "true"
     hibernate:
       ddl-auto: update
+    open-in-view: false
     flyway:
       baseline-on-migrate: true
       baseline-version: 0
@@ -15,7 +16,7 @@ spring:
     password: ${DEV_DATASOURCE_PASSWORD:root}
     driver-class-name: org.postgresql.Driver
     username: ${DEV_DATASOURCE_USERNAME:root}
-    url: ${DEV_DATASOURCE_URL:jdbc:postgresql://localhost:5432/serwin_auth_db_dev}
+    url: ${DEV_DATASOURCE_URL:jdbc:postgresql://localhost:5432/serwin_auth_db}
 
   mail:
     host: ${DEV_MAIL_HOST:smtp.gmail.com}
@@ -27,7 +28,11 @@ spring:
         smtp:
           auth: true
           starttls:
-            enable: true 
+            enable: true
+
+  # Graceful shutdown configuration
+  lifecycle:
+    timeout-per-shutdown-phase: 30s
 
 logging:
   level:
@@ -61,8 +66,37 @@ nats:
   username: ${DEV_NATS_USERNAME:auth-server}
   password: ${DEV_NATS_PASSWORD:auth-secret}
 
+server:
+  port: ${AUTH_SERVICE_PORT:8081}
+  # Graceful shutdown
+  shutdown: graceful
+  # Compression
+  compression:
+    enabled: true
+    mime-types: application/json,application/xml,text/html,text/xml,text/plain
+
+# Scheduled tasks
+scheduled:
+  token-cleanup:
+    cron: "0 0 * * * *" # Every hour
+
 # Add actuator endpoints for health checks
 management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info
   endpoint:
     health:
       show-details: always
+
+# Eureka client configuration
+eureka:
+  client:
+    service-url:
+      defaultZone: ${EUREKA_SERVER_URL:http://127.0.0.1:8761/eureka/}
+    register-with-eureka: true
+    fetch-registry: true
+  instance:
+    prefer-ip-address: true
+    instance-id: ${spring.application.name}:${server.port}

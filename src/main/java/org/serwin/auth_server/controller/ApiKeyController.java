@@ -33,8 +33,8 @@ public class ApiKeyController {
             String email = getCurrentUserEmail();
             ApiKeyResponse response = apiKeyService.generateApiKey(email, request);
 
-            // Publish event
-            natsService.publish("auth.apikey.created", Map.of(
+            // Publish event: apikey.created
+            natsService.publish("apikey", "created", Map.of(
                     "email", email,
                     "accessKeyId", response.getAccessKeyId(),
                     "keyName", request.getName(),
@@ -70,8 +70,8 @@ public class ApiKeyController {
             String email = getCurrentUserEmail();
             String accessKeyId = apiKeyService.revokeApiKey(UUID.fromString(keyId), email);
 
-            // Publish event
-            natsService.publish("auth.apikey.revoked", Map.of(
+            // Publish event: apikey.revoked
+            natsService.publish("apikey", "revoked", Map.of(
                     "email", email,
                     "accessKeyId", accessKeyId,
                     "keyId", keyId,

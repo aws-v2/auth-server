@@ -5,6 +5,8 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.serwin.auth_server.dto.*;
 import org.serwin.auth_server.service.AuthService;
+import org.serwin.auth_server.service.NatsService;
+import org.serwin.auth_server.service.TokenBlacklistService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;
@@ -23,6 +25,9 @@ import java.util.Map;
 public class AuthController {
 
     private final AuthService authService;
+    private final TokenBlacklistService tokenBlacklistService;
+    private final NatsService natsService;
+
     private static final Logger auditLog = LoggerFactory.getLogger("AUDIT");
 
     @PostMapping("/register")
@@ -30,6 +35,14 @@ public class AuthController {
         log.info("Registration attempt for email: {}", request.getEmail());
         try {
             LoginResponse response = authService.register(request);
+
+            // Publish registration event: user.registered
+            natsService.publish("user", "registered", Map.of(
+                    "email", request.getEmail(),
+                    "mfaEnabled", false, // Default for new registration
+                    "registrationType", "Standard",
+                    "timestamp", java.time.LocalDateTime.now().toString()));
+
             auditLog.info("USER_REGISTERED - email={}", request.getEmail());
             log.info("Registration successful for email: {}", request.getEmail());
             return ResponseEntity.ok(response);
@@ -170,9 +183,6 @@ public class AuthController {
         }
     }
 
-    private final org.serwin.auth_server.service.TokenBlacklistService tokenBlacklistService;
-    private final org.serwin.auth_server.service.NatsService natsService;
-
     @PostMapping("/logout")
     public ResponseEntity<?> logout(jakarta.servlet.http.HttpServletRequest request) {
         try {
@@ -182,8 +192,8 @@ public class AuthController {
 
             tokenBlacklistService.blacklistToken(token, email, "User logout");
 
-            // Publish event
-            natsService.publish("auth.token.blacklisted", Map.of(
+            // Publish event: token.blacklisted
+            natsService.publish("token", "blacklisted", Map.of(
                     "email", email,
                     "tokenHash", tokenBlacklistService.hashToken(token),
                     "reason", "User logout",

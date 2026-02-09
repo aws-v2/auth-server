@@ -2,7 +2,6 @@ package org.serwin.auth_server.service;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import io.nats.client.Connection;
-import io.nats.client.Dispatcher;
 import io.nats.client.Nats;
 import io.nats.client.Options;
 import jakarta.annotation.PostConstruct;
@@ -13,7 +12,6 @@ import org.springframework.stereotype.Service;
 
 import java.io.IOException;
 import java.time.Duration;
-import java.util.function.Function;
 
 @Service
 @RequiredArgsConstructor
@@ -24,10 +22,13 @@ public class NatsService {
     private String natsUrl;
 
     @Value("${nats.username:}")
-    private String username;
+    private String natsUsername;
 
     @Value("${nats.password:}")
-    private String password;
+    private String natsPassword;
+
+    @Value("${spring.profiles.active:dev}")
+    private String env;
 
     private final ObjectMapper objectMapper;
     private Connection natsConnection;
@@ -41,52 +42,42 @@ public class NatsService {
                     .maxReconnects(-1)
                     .reconnectWait(Duration.ofSeconds(2));
 
-            if (username != null && !username.isEmpty()) {
-                builder.userInfo(username, password);
+            if (natsUsername != null && !natsUsername.isEmpty()) {
+                builder.userInfo(natsUsername, natsPassword);
             }
 
             natsConnection = Nats.connect(builder.build());
-            log.info("Connected to NATS at {}", natsUrl);
+            log.info("Connected to NATS at {} with environment prefix: {}", natsUrl, env);
         } catch (IOException | InterruptedException e) {
             log.error("Failed to connect to NATS: {}", e.getMessage());
-            // Don't throw exception to allow app to start even if NATS is down,
-            // but functionality will be degraded
         }
     }
 
-    public <T> void publish(String subject, T payload) {
+    /**
+     * High-level publish method using the standardized scheme:
+     * <env>.auth.v1.<domain>.<action>
+     */
+    public void publish(String domain, String action, Object payload) {
         if (natsConnection == null || natsConnection.getStatus() != Connection.Status.CONNECTED) {
-            log.warn("NATS not connected, skipping publish to {}", subject);
+            log.warn("NATS not connected, skipping publish to domain: {}", domain);
             return;
         }
+
+        String subject = String.format("%s.auth.v1.%s.%s", env, domain, action);
+
         try {
             String json = objectMapper.writeValueAsString(payload);
             natsConnection.publish(subject, json.getBytes());
+            log.debug("Published NATS event to subject: {}", subject);
         } catch (Exception e) {
-            log.error("Failed to publish to {}: {}", subject, e.getMessage());
+            log.error("Failed to publish to subject {}: {}", subject, e.getMessage());
         }
     }
 
-    public <T, R> void subscribe(String subject, Class<T> requestType, Function<T, R> handler) {
-        if (natsConnection == null) {
-            log.warn("NATS not connected, cannot subscribe to {}", subject);
-            return;
-        }
-
-        Dispatcher dispatcher = natsConnection.createDispatcher(msg -> {
-            try {
-                T request = objectMapper.readValue(msg.getData(), requestType);
-                R response = handler.apply(request);
-
-                if (msg.getReplyTo() != null) {
-                    String responseJson = objectMapper.writeValueAsString(response);
-                    natsConnection.publish(msg.getReplyTo(), responseJson.getBytes());
-                }
-            } catch (Exception e) {
-                log.error("Error handling NATS message on {}: {}", subject, e.getMessage());
-            }
-        });
-        dispatcher.subscribe(subject);
-        log.info("Subscribed to NATS subject: {}", subject);
+    /**
+     * Direct connection access for the listener
+     */
+    public Connection getConnection() {
+        return natsConnection;
     }
 }
