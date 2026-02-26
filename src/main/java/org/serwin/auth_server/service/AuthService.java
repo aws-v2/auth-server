@@ -336,21 +336,27 @@ public class AuthService {
         }
     }
 
-    public UserDto getCurrentUser(String email) {
-        log.debug("Fetching user details for: {}", email);
+public UserDto getCurrentUser(String email) {
+    log.debug("Fetching user details for: {}", email);
 
-        User user = userRepository.findByEmail(email)
-                .orElseThrow(() -> {
-                    log.error("User not found when fetching current user: {}", email);
-                    return new RuntimeException("User not found");
-                });
+    User user = userRepository.findByEmail(email)
+            .orElseThrow(() -> {
+                log.error("User not found when fetching current user: {}", email);
+                return new RuntimeException("User not found");
+            });
 
-        UserDto userDto = new UserDto();
-        userDto.setId(user.getId());
-        userDto.setEmail(user.getEmail());
-        userDto.setMfaEnabled(user.isMfaEnabled());
-        userDto.setEmailVerified(user.isEmailVerified());
-        userDto.setCreatedAt(user.getCreatedAt());
-        return userDto;
+    UserDto userDto = new UserDto();
+    userDto.setId(user.getId());
+    userDto.setEmail(user.getEmail());
+    userDto.setMfaEnabled(user.isMfaEnabled());
+    userDto.setEmailVerified(user.isEmailVerified());
+    userDto.setCreatedAt(user.getCreatedAt());
+
+    // ✅ Only include verification code if NOT verified
+    if (!user.isEmailVerified()) {
+        userDto.setVerificationToken(user.getVerificationToken());
     }
+
+    return userDto;
+}
 }

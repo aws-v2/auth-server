@@ -36,7 +36,9 @@ public class ApiKeyController {
             // Publish event: apikey.created
             natsService.publish("apikey", "created", Map.of(
                     "email", email,
+                    "userId", response.getUserId(),
                     "accessKeyId", response.getAccessKeyId(),
+                    "secretKeyHash", response.getSecretKeyHash(),
                     "keyName", request.getName(),
                     "timestamp", LocalDateTime.now().toString()));
 

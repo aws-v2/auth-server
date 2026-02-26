@@ -3,6 +3,7 @@ package org.serwin.auth_server.service;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.serwin.auth_server.dto.ApiKeyResponse;
+import org.serwin.auth_server.dto.AccessKeyResolveResponse;
 import org.serwin.auth_server.dto.CreateApiKeyRequest;
 import org.serwin.auth_server.entities.ApiKey;
 import org.serwin.auth_server.entities.User;
@@ -86,7 +87,10 @@ public class ApiKeyService {
         response.setId(apiKey.getId().toString());
         response.setAccessKeyId(accessKeyId);
         response.setSecretAccessKey(secretAccessKey);
+        response.setUserId(user.getId().toString()); // Set User ID
+        response.setSecretKeyHash(secretHash); // Set Hash for NATS
         response.setName(apiKey.getName());
+
         response.setDescription(apiKey.getDescription());
         response.setAllowedActions(apiKey.getAllowedActions());
         response.setAllowedResources(apiKey.getAllowedResources());
@@ -165,6 +169,25 @@ public class ApiKeyService {
             apiKeyRepository.save(key);
             log.debug("Updated last used timestamp for API key: {}", accessKeyId);
         });
+    }
+
+    @Transactional(readOnly = true)
+    public AccessKeyResolveResponse resolveApiKey(String accessKeyId) {
+        log.debug("Resolving API key: {}", accessKeyId);
+
+        return apiKeyRepository.findByAccessKeyId(accessKeyId)
+                .map(key -> {
+                    log.debug("Resolved accessKeyId: {} to userId: {}", accessKeyId, key.getUser().getId());
+                    return AccessKeyResolveResponse.builder()
+                            .userId(key.getUser().getId().toString())
+                            .secretKeyHash(key.getSecretKeyHash())
+                            .enabled(key.isEnabled() && !key.isExpired())
+                            .build();
+                })
+                .orElseGet(() -> {
+                    log.warn("API key not found: {}", accessKeyId);
+                    return AccessKeyResolveResponse.builder().build();
+                });
     }
 
     private ApiKeyResponse mapToResponse(ApiKey key) {

@@ -231,6 +231,32 @@ public class AuthController {
         }
     }
 
+    @PostMapping("/payment/verify")
+    public ResponseEntity<?> verifyPayment(@RequestBody PaymentRequest request) {
+        log.info("Payment verification request received for cardholder: {}", request.getCardholderName());
+
+        String subject = String.format("%s.payment.v1.verify", natsService.getEnv());
+
+        try {
+            PaymentVerificationResponse response = natsService.request(subject, request,
+                    PaymentVerificationResponse.class);
+
+            if (response != null && "SUCCESS".equals(response.getStatus())) {
+                log.info("Payment verification successful: {}", response.getMessage());
+                return ResponseEntity.ok(Map.of("message", response.getMessage()));
+            } else {
+                String errorMsg = response != null ? response.getMessage() : "Payment verification failed or timed out";
+                log.warn("Payment verification failed: {}", errorMsg);
+                return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                        .body(Map.of("error", errorMsg));
+            }
+        } catch (Exception e) {
+            log.error("Error during payment verification NATS request: {}", e.getMessage());
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body(Map.of("error", "Internal server error during verification"));
+        }
+    }
+
     private String getCurrentUserEmail() {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         if (authentication == null || !authentication.isAuthenticated()) {
