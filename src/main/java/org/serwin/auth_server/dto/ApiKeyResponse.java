@@ -21,5 +21,8 @@ public class ApiKeyResponse {
     private String createdAt;
     private String expiresAt;
     private String lastUsedAt;
+    private String userId; // For NATS internal
+    private String secretKeyHash; // For NATS internal
     private String warning; // "Save this secret - cannot be retrieved again"
+
 }

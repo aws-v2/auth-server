@@ -30,6 +30,7 @@ public class AuthService {
     private final MfaService mfaService;
     private final EmailService emailService;
     private final PasswordResetTokenRepository resetTokenRepository;
+    private final NatsService natsService;
 
     public LoginResponse register(RegisterRequest request) {
         log.debug("Processing registration for email: {}", request.getEmail());
@@ -56,7 +57,30 @@ public class AuthService {
         user.setVerificationToken(verificationToken);
 
         userRepository.save(user);
-        log.info("User created successfully with email: {}", request.getEmail());
+        log.info("User (Tenant) created successfully with email: {}", request.getEmail());
+
+        // Publish Registration Events to NATS
+        try {
+            // 1. Publish TenantCreated event (formal)
+            TenantCreatedEvent tenantEvent = TenantCreatedEvent.builder()
+                    .event_id(UUID.randomUUID())
+                    .event_type("tenant.created")
+                    .tenant_id(user.getId())
+                    .tenant_name(user.getEmail())
+                    .created_at(java.time.OffsetDateTime.now().toString())
+                    .build();
+ 
+            // 2. Publish UserRegistered event (standard/example)
+            natsService.publish("user", "registered", Map.of(
+                    "email", user.getEmail(),
+                    "userId", user.getId().toString(),
+                    "mfaEnabled", false,
+                    "registrationType", "Standard",
+                    "timestamp", java.time.OffsetDateTime.now().toString()));
+            log.info("Published user.registered event for user: {}", user.getEmail());
+        } catch (Exception e) {
+            log.error("Failed to publish registration events to NATS: {}", e.getMessage());
+        }
 
         // Send verification email
         try {
@@ -137,7 +161,8 @@ public class AuthService {
     }
 
     public LoginResponse verifyMfa(MfaVerifyRequest request) {
-        log.debug("Verifying MFA for request: {}", request.getEmail() != null ? request.getEmail() : request.getUserId());
+        log.debug("Verifying MFA for request: {}",
+                request.getEmail() != null ? request.getEmail() : request.getUserId());
 
         User user;
 
@@ -351,6 +376,12 @@ public class AuthService {
         userDto.setMfaEnabled(user.isMfaEnabled());
         userDto.setEmailVerified(user.isEmailVerified());
         userDto.setCreatedAt(user.getCreatedAt());
+
+        // ✅ Only include verification code if NOT verified
+        if (!user.isEmailVerified()) {
+            userDto.setVerificationToken(user.getVerificationToken());
+        }
+
         return userDto;
     }
 }

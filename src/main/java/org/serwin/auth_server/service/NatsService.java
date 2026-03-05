@@ -2,6 +2,7 @@ package org.serwin.auth_server.service;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import io.nats.client.Connection;
+import io.nats.client.Message;
 import io.nats.client.Nats;
 import io.nats.client.Options;
 import jakarta.annotation.PostConstruct;
@@ -72,6 +73,36 @@ public class NatsService {
         } catch (Exception e) {
             log.error("Failed to publish to subject {}: {}", subject, e.getMessage());
         }
+    }
+
+    /**
+     * Synchronous request-reply method.
+     */
+    public <T> T request(String subject, Object payload, Class<T> responseType) {
+        if (natsConnection == null || natsConnection.getStatus() != Connection.Status.CONNECTED) {
+            log.warn("NATS not connected, skipping request to subject: {}", subject);
+            return null;
+        }
+
+        try {
+            byte[] data = objectMapper.writeValueAsBytes(payload);
+            java.util.concurrent.CompletableFuture<Message> future = natsConnection.request(subject, data);
+            Message reply = future.get(5, java.util.concurrent.TimeUnit.SECONDS);
+
+            if (reply != null && reply.getData() != null) {
+                return objectMapper.readValue(reply.getData(), responseType);
+            }
+        } catch (Exception e) {
+            log.error("NATS request failed for subject {}: {}", subject, e.getMessage());
+        }
+        return null;
+    }
+
+    /**
+     * Get the current environment prefix for topics
+     */
+    public String getEnv() {
+        return env;
     }
 
     /**

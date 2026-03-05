@@ -36,13 +36,6 @@ public class AuthController {
         try {
             LoginResponse response = authService.register(request);
 
-            // Publish registration event: user.registered
-            natsService.publish("user", "registered", Map.of(
-                    "email", request.getEmail(),
-                    "mfaEnabled", false, // Default for new registration
-                    "registrationType", "Standard",
-                    "timestamp", java.time.LocalDateTime.now().toString()));
-
             auditLog.info("USER_REGISTERED - email={}", request.getEmail());
             log.info("Registration successful for email: {}", request.getEmail());
             return ResponseEntity.ok(response);
@@ -228,6 +221,32 @@ public class AuthController {
             log.error("Failed to fetch current user - Error: {}", e.getMessage());
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
                     .body(Map.of("error", e.getMessage()));
+        }
+    }
+
+    @PostMapping("/payment/verify")
+    public ResponseEntity<?> verifyPayment(@RequestBody PaymentRequest request) {
+        log.info("Payment verification request received for cardholder: {}", request.getCardholderName());
+
+        String subject = String.format("%s.payment.v1.verify.requested", natsService.getEnv());
+
+        try {
+            PaymentVerificationResponse response = natsService.request(subject, request,
+                    PaymentVerificationResponse.class);
+
+            if (response != null && "SUCCESS".equals(response.getStatus())) {
+                log.info("Payment verification successful: {}", response.getMessage());
+                return ResponseEntity.ok(Map.of("message", response.getMessage()));
+            } else {
+                String errorMsg = response != null ? response.getMessage() : "Payment verification failed or timed out";
+                log.warn("Payment verification failed: {}", errorMsg);
+                return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                        .body(Map.of("error", errorMsg));
+            }
+        } catch (Exception e) {
+            log.error("Error during payment verification NATS request: {}", e.getMessage());
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body(Map.of("error", "Internal server error during verification"));
         }
     }
 
