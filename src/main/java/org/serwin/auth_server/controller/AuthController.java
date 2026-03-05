@@ -36,13 +36,6 @@ public class AuthController {
         try {
             LoginResponse response = authService.register(request);
 
-            // Publish registration event: user.registered
-            natsService.publish("user", "registered", Map.of(
-                    "email", request.getEmail(),
-                    "mfaEnabled", false, // Default for new registration
-                    "registrationType", "Standard",
-                    "timestamp", java.time.LocalDateTime.now().toString()));
-
             auditLog.info("USER_REGISTERED - email={}", request.getEmail());
             log.info("Registration successful for email: {}", request.getEmail());
             return ResponseEntity.ok(response);
@@ -235,7 +228,7 @@ public class AuthController {
     public ResponseEntity<?> verifyPayment(@RequestBody PaymentRequest request) {
         log.info("Payment verification request received for cardholder: {}", request.getCardholderName());
 
-        String subject = String.format("%s.payment.v1.verify", natsService.getEnv());
+        String subject = String.format("%s.payment.v1.verify.requested", natsService.getEnv());
 
         try {
             PaymentVerificationResponse response = natsService.request(subject, request,
