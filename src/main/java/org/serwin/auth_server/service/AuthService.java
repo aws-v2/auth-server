@@ -72,12 +72,15 @@ public class AuthService {
  
             // 2. Publish UserRegistered event (standard/example)
             natsService.publish("user", "registered", Map.of(
-                    "email", user.getEmail(),
-                    "userId", user.getId().toString(),
-                    "mfaEnabled", false,
-                    "registrationType", "Standard",
+                    "tenant_name", user.getEmail().split("@")[0],
+                    "tenant_email", user.getEmail(),
+                    "tenant_id", user.getId().toString(),
                     "timestamp", java.time.OffsetDateTime.now().toString()));
             log.info("Published user.registered event for user: {}", user.getEmail());
+
+
+
+
         } catch (Exception e) {
             log.error("Failed to publish registration events to NATS: {}", e.getMessage());
         }
