@@ -16,7 +16,7 @@ spring:
     password: ${DEV_DATASOURCE_PASSWORD:root}
     driver-class-name: org.postgresql.Driver
     username: ${DEV_DATASOURCE_USERNAME:root}
-    url: ${DEV_DATASOURCE_URL:jdbc:postgresql://localhost:5432/authdb}
+    url: ${DEV_DATASOURCE_URL:jdbc:postgresql://localhost:5432/auth_db}
 
   mail:
     host: ${DEV_MAIL_HOST:smtp.gmail.com}
