@@ -51,6 +51,6 @@ jobs:
             docker stop auth-server-staging || true
             docker rm auth-server-staging || true
             docker run -d --name auth-server-staging \
-              --network mini-aws-network \
+              --network  aws-network \
               -p 8081:8081 \
               qarani/auth-server:staging
