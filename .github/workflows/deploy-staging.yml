@@ -10,7 +10,7 @@ jobs:
     steps:
     - uses: actions/checkout@v4
 
-    - name: Set up Docker Buildx
+    - name: Set up Docker Buildx.
       uses: docker/setup-buildx-action@v3
 
     - name: Login to Docker Hub
@@ -46,7 +46,11 @@ jobs:
           username: ${{ secrets.STAGING_USERNAME }}
           key: ${{ secrets.STAGING_SSH_KEY }}
           script: |
+            docker network create mini-aws-network || true
             docker pull qarani/auth-server:staging
             docker stop auth-server-staging || true
             docker rm auth-server-staging || true
-            docker run -d --name auth-server-staging -p 8081:8081 qarani/auth-server:staging
+            docker run -d --name auth-server-staging \
+              --network mini-aws-network \
+              -p 8081:8081 \
+              qarani/auth-server:staging
