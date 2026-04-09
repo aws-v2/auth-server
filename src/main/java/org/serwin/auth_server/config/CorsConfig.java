@@ -11,3 +11,7 @@ public class CorsConfig implements WebMvcConfigurer {
         // Disabled - CORS configured in SecurityConfig
     }
 }
+
+
+
+
