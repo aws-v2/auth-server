@@ -1,3 +1,22 @@
+server:
+  port: ${AUTH_SERVICE_PORT}
+  shutdown: graceful
+  compression:
+    enabled: true
+    mime-types: application/json,application/xml,text/html,text/xml,text/plain
+
+frontend:
+  url: ${PROD_FRONTEND_URL}
+
+jwt:
+  secret: ${PROD_JWT_SECRET}
+  expiration: ${PROD_JWT_EXPIRATION}
+
+nats:
+  url: ${PROD_NATS_URL}
+  username: ${PROD_NATS_USERNAME}
+  password: ${PROD_NATS_PASSWORD}
+
 spring:
   application:
     name: auth-service
@@ -13,22 +32,20 @@ spring:
     flyway:
       baseline-on-migrate: true
       baseline-version: 0
-
   datasource:
-    password: ${PROD_DATASOURCE_PASSWORD:npg_FUvQyuo8M9Kc}
+    password: ${PROD_DATASOURCE_PASSWORD}
     driver-class-name: org.postgresql.Driver
-    username: ${PROD_DATASOURCE_USERNAME:neondb_owner}
-    url: ${PROD_DATASOURCE_URL:jdbc:postgresql://ep-sparkling-dust-a4zga52i-pooler.us-east-1.aws.neon.tech/serwin-auth-db?sslmode=require}
+    username: ${PROD_DATASOURCE_USERNAME}
+    url: ${PROD_DATASOURCE_URL}
     hikari:
       maximum-pool-size: 20
       minimum-idle: 5
       connection-timeout: 30000
       idle-timeout: 600000
       max-lifetime: 1800000
-
   mail:
-    host: ${PROD_MAIL_HOST:smtp.gmail.com}
-    port: ${PROD_MAIL_PORT:587}
+    host: ${PROD_MAIL_HOST}
+    port: ${PROD_MAIL_PORT}
     username: ${PROD_MAIL_USERNAME}
     password: ${PROD_MAIL_PASSWORD}
     properties:
@@ -37,58 +54,21 @@ spring:
           auth: true
           starttls:
             enable: true
-
-  # Graceful shutdown configuration
   lifecycle:
     timeout-per-shutdown-phase: 30s
 
-logging:
-  level:
-    root: INFO
-    org:
-      serwin:
-        auth_server: INFO
-      springframework:
-        security: WARN
-        web: WARN
-    # Audit logger
-    AUDIT: INFO
-  pattern:
-    console: "%d{yyyy-MM-dd HH:mm:ss.SSS} [%thread] %-5level %logger{36} - %msg%n"
-  file:
-    name: logs/auth-server-prod.log
-    max-size: 50MB
-    max-history: 30
+eureka:
+  client:
+    service-url:
+      defaultZone: ${EUREKA_SERVER_URL:http://discovery-server:8761/eureka}
+    register-with-eureka: true
+    fetch-registry: true
+  instance:
+    prefer-ip-address: true
+    instance-id: ${spring.application.name}:${spring.cloud.client.ip-address}:${server.port}
+    lease-renewal-interval-in-seconds: 30
+    lease-expiration-duration-in-seconds: 90
 
-jwt:
-  secret: ${PROD_JWT_SECRET:"somesecret"}
-  expiration: ${JWT_SECRET_EXPIRATION:86400000}
-
-server:
-  port: ${AUTH_SERVICE_PORT:8081}
-  # Graceful shutdown
-  shutdown: graceful
-  # Compression
-  compression:
-    enabled: true
-    mime-types: application/json,application/xml,text/html,text/xml,text/plain
-
-app:
-  frontend:
-    url: ${PROD_FRONTEND_URL}
-
-# NATS Configuration
-nats:
-  url: ${PROD_NATS_URL}
-  username: ${PROD_NATS_USERNAME}
-  password: ${PROD_NATS_PASSWORD}
-
-# Scheduled tasks
-scheduled:
-  token-cleanup:
-    cron: "0 0 * * * *" # Every hour
-
-# Add actuator endpoints for health checks
 management:
   endpoints:
     web:
@@ -102,15 +82,23 @@ management:
       export:
         enabled: true
 
-# Eureka client configuration for production
-eureka:
-  client:
-    service-url:
-      defaultZone: ${EUREKA_SERVER_URL:http://discovery-server:8761/eureka}
-    register-with-eureka: true
-    fetch-registry: true
-  instance:
-    prefer-ip-address: true
-    instance-id: ${spring.application.name}:${spring.cloud.client.ip-address}:${server.port}
-    lease-renewal-interval-in-seconds: 30
-    lease-expiration-duration-in-seconds: 90
+logging:
+  level:
+    root: INFO
+    org:
+      serwin:
+        auth_server: INFO
+      springframework:
+        security: WARN
+        web: WARN
+    AUDIT: INFO
+  pattern:
+    console: "%d{yyyy-MM-dd HH:mm:ss.SSS} [%thread] %-5level %logger{36} - %msg%n"
+  file:
+    name: logs/auth-server-prod.log
+    max-size: 50MB
+    max-history: 30
+
+scheduled:
+  token-cleanup:
+    cron: "0 0 * * * *" # Every hour

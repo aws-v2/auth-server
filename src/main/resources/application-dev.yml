@@ -1,4 +1,25 @@
+server:
+  port: ${DEV_SERVER_PORT:8081}
+  shutdown: graceful
+  compression:
+    enabled: true
+    mime-types: application/json,application/xml,text/html,text/xml,text/plain
+
+frontend:
+  url: ${DEV_FRONTEND_URL:http://localhost:5173}
+
+jwt:
+  secret: ${DEV_JWT_SECRET:404E635266556A586E3272357538782F413F4428472B4B6250645367566B5970404E635266556A586E3272357538782F413F4428472B4B6250645367566B5970}
+  expiration: ${JWT_SECRET_EXPIRATION:86400000}
+
+nats:
+  url: ${DEV_NATS_URL:nats://localhost:4222}
+  username: ${DEV_NATS_USERNAME:auth-server}
+  password: ${DEV_NATS_PASSWORD:auth-secret}
+
 spring:
+  application:
+    name: auth-service
   jpa:
     properties:
       hibernate:
@@ -11,13 +32,11 @@ spring:
     flyway:
       baseline-on-migrate: true
       baseline-version: 0
-
   datasource:
     password: ${DEV_DATASOURCE_PASSWORD:root}
     driver-class-name: org.postgresql.Driver
     username: ${DEV_DATASOURCE_USERNAME:root}
     url: ${DEV_DATASOURCE_URL:jdbc:postgresql://localhost:5432/auth_db}
-
   mail:
     host: ${DEV_MAIL_HOST:smtp.gmail.com}
     port: ${DEV_MAIL_PORT:587}
@@ -29,10 +48,27 @@ spring:
           auth: true
           starttls:
             enable: true
-
-  # Graceful shutdown configuration
   lifecycle:
     timeout-per-shutdown-phase: 30s
+
+eureka:
+  client:
+    service-url:
+      defaultZone: ${DEV_EUREKA_URL:http://127.0.0.1:8761/eureka/}
+    register-with-eureka: true
+    fetch-registry: true
+  instance:
+    prefer-ip-address: true
+    instance-id: ${spring.application.name}:${server.port}
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info
+  endpoint:
+    health:
+      show-details: always
 
 logging:
   level:
@@ -43,7 +79,6 @@ logging:
       springframework:
         security: DEBUG
         web: DEBUG
-    # Audit logger
     AUDIT: INFO
   pattern:
     console: "%d{yyyy-MM-dd HH:mm:ss.SSS} [%thread] %highlight(%-5level) %cyan(%logger{36}) - %msg%n"
@@ -52,51 +87,6 @@ logging:
     max-size: 10MB
     max-history: 7
 
-jwt:
-  secret: ${DEV_JWT_SECRET:404E635266556A586E3272357538782F413F4428472B4B6250645367566B5970404E635266556A586E3272357538782F413F4428472B4B6250645367566B5970}
-  expiration: ${JWT_SECRET_EXPIRATION:86400000}
-
-app:
-  frontend:
-    url: ${DEV_FRONTEND_URL:http://localhost:5173}
-
-# NATS Configuration
-nats:
-  url: ${DEV_NATS_URL:nats://localhost:4222}
-  username: ${DEV_NATS_USERNAME:auth-server}
-  password: ${DEV_NATS_PASSWORD:auth-secret}
-
-server:
-  port: ${AUTH_SERVICE_PORT:8081}
-  # Graceful shutdown
-  shutdown: graceful
-  # Compression
-  compression:
-    enabled: true
-    mime-types: application/json,application/xml,text/html,text/xml,text/plain
-
-# Scheduled tasks
 scheduled:
   token-cleanup:
     cron: "0 0 * * * *" # Every hour
-
-# Add actuator endpoints for health checks
-management:
-  endpoints:
-    web:
-      exposure:
-        include: health,info
-  endpoint:
-    health:
-      show-details: always
-
-# Eureka client configuration
-eureka:
-  client:
-    service-url:
-      defaultZone: ${EUREKA_SERVER_URL:http://127.0.0.1:8761/eureka/}
-    register-with-eureka: true
-    fetch-registry: true
-  instance:
-    prefer-ip-address: true
-    instance-id: ${spring.application.name}:${server.port}
