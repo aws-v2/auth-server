@@ -29,9 +29,9 @@ spring:
     hibernate:
       ddl-auto: update
     open-in-view: false
-    flyway:
-      baseline-on-migrate: true
-      baseline-version: 0
+  flyway:
+    baseline-on-migrate: true
+    baseline-version: 0
   datasource:
     password: ${STAGING_DATASOURCE_PASSWORD:root}
     driver-class-name: org.postgresql.Driver
