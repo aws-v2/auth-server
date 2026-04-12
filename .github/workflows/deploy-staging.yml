@@ -62,7 +62,7 @@ jobs:
               -e STAGING_NATS_PASSWORD=auth-secret \
               -e DEV_DATASOURCE_PASSWORD=root \
               -e DEV_DATASOURCE_USERNAME=root \
-              -e DEV_DATASOURCE_URL=jdbc:postgresql://postgres:5432/auth_db \
+              -e DEV_DATASOURCE_URL=jdbc:postgresql://postgres-staging:5432/auth_db \
               -e DEV_MAIL_HOST=smtp.gmail.com \
               -e DEV_MAIL_PORT=587 \
               -e DEV_MAIL_USERNAME=emqarani@gmail.com \
