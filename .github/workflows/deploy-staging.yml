@@ -68,5 +68,5 @@ jobs:
               -e STAGING_MAIL_PORT=587 \
               -e STAGING_MAIL_USERNAME=emqarani@gmail.com \
               -e STAGING_MAIL_PASSWORD="cbhs oyci khfa psij" \
-              -e EUREKA_SERVER_URL=http://discovery-server:8761/eureka/ \
+              -e EUREKA_SERVER_URL=http://discovery-server-staging:8761/eureka/ \
               qarani/auth-server:staging
