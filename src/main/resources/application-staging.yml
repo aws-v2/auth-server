@@ -13,7 +13,7 @@ jwt:
   expiration: ${JWT_SECRET_EXPIRATION:86400000}
 
 nats:
-  url: nats://nats:4222
+  url: nats://${STAGING_NATS_URL:nats-staging:4222}
   username: ${STAGING_NATS_USERNAME:auth-server}
   password: ${STAGING_NATS_PASSWORD:auth-secret}
 
