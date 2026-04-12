@@ -33,10 +33,10 @@ spring:
       baseline-on-migrate: true
       baseline-version: 0
   datasource:
-    password: ${DEV_DATASOURCE_PASSWORD:root}
+    password: ${STAGING_DATASOURCE_PASSWORD:root}
     driver-class-name: org.postgresql.Driver
-    username: ${DEV_DATASOURCE_USERNAME:root}
-    url: ${DEV_DATASOURCE_URL:jdbc:postgresql://postgres-staging:5432/auth_db}
+    username: ${STAGING_DATASOURCE_USERNAME:root}
+    url: ${STAGING_DATASOURCE_URL:jdbc:postgresql://postgres-staging:5432/auth_db}
     hikari:
       maximum-pool-size: 20
       minimum-idle: 5
@@ -44,10 +44,10 @@ spring:
       idle-timeout: 600000
       max-lifetime: 1800000
   mail:
-    host: ${DEV_MAIL_HOST:smtp.gmail.com}
-    port: ${DEV_MAIL_PORT:587}
-    username: ${DEV_MAIL_USERNAME:emqarani@gmail.com}
-    password: ${DEV_MAIL_PASSWORD:cbhs oyci khfa psij}
+    host: ${STAGING_MAIL_HOST:smtp.gmail.com}
+    port: ${STAGING_MAIL_PORT:587}
+    username: ${STAGING_MAIL_USERNAME:emqarani@gmail.com}
+    password: ${STAGING_MAIL_PASSWORD:cbhs oyci khfa psij}
     properties:
       mail:
         smtp:
