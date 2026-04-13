@@ -14,8 +14,8 @@ jwt:
 
 nats:
   url: nats://${STAGING_NATS_URL:nats-staging:4222}
-  username: ${STAGING_NATS_USERNAME:auth-server}
-  password: ${STAGING_NATS_PASSWORD:auth-secret}
+  username: ${STAGING_NATS_USERNAME:nats-staging-user}
+  password: ${STAGING_NATS_PASSWORD:nats-staging-password}
 
 spring:
   application:
@@ -33,9 +33,9 @@ spring:
     baseline-on-migrate: true
     baseline-version: 0
   datasource:
-    password: ${STAGING_DATASOURCE_PASSWORD:root}
+    password: ${STAGING_DATASOURCE_PASSWORD:postgres-staging-user}
     driver-class-name: org.postgresql.Driver
-    username: ${STAGING_DATASOURCE_USERNAME:root}
+    username: ${STAGING_DATASOURCE_USERNAME:postgres-staging-password}
     url: ${STAGING_DATASOURCE_URL:jdbc:postgresql://postgres-staging:5432/auth_db}
     hikari:
       maximum-pool-size: 20
