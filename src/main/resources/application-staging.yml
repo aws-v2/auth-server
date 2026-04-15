@@ -33,9 +33,9 @@ spring:
     baseline-on-migrate: true
     baseline-version: 0
   datasource:
-    password: ${STAGING_DATASOURCE_PASSWORD:postgres-staging-user}
+    password: ${STAGING_DATASOURCE_PASSWORD:postgres-staging-password}
     driver-class-name: org.postgresql.Driver
-    username: ${STAGING_DATASOURCE_USERNAME:postgres-staging-password}
+    username: ${STAGING_DATASOURCE_USERNAME:postgres-staging-user}
     url: ${STAGING_DATASOURCE_URL:jdbc:postgresql://postgres-staging:5432/auth_db}
     hikari:
       maximum-pool-size: 20
