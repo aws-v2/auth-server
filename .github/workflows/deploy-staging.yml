@@ -61,8 +61,13 @@ jobs:
               -e STAGING_NATS_USERNAME=nats-staging-user \
               -e STAGING_NATS_URL=nats-staging:4222 \
               -e STAGING_NATS_PASSWORD=nats-staging-password \
+<<<<<<< HEAD
               -e STAGING_DATASOURCE_PASSWORD=postgres-staging-password \
               -e STAGING_DATASOURCE_USERNAME=postgres-staging-user \
+=======
+              -e STAGING_DATASOURCE_PASSWORD=postgres-staging-user \
+              -e STAGING_DATASOURCE_USERNAME=postgres-staging-password \
+>>>>>>> d7e7d486a9997f8aecd8880b4333ddcbf98f1aa2
               -e STAGING_DATASOURCE_URL=jdbc:postgresql://postgres-staging:5432/auth_db \
               -e STAGING_MAIL_HOST=smtp.gmail.com \
               -e STAGING_MAIL_PORT=587 \
