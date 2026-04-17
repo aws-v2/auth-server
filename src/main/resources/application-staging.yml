@@ -17,6 +17,8 @@ nats:
   username: ${STAGING_NATS_USERNAME:nats-staging-user}
   password: ${STAGING_NATS_PASSWORD:nats-staging-password}
 
+app:
+  email-verification-enabled: ${STAGING_EMAIL_VERIFICATION_ENABLED:false}
 spring:
   application:
     name: auth-service
