@@ -17,6 +17,9 @@ nats:
   username: ${DEV_NATS_USERNAME:auth-server}
   password: ${DEV_NATS_PASSWORD:auth-secret}
 
+app:
+  email-verification-enabled: ${DEV_EMAIL_VERIFICATION_ENABLED:false}
+
 spring:
   application:
     name: auth-service

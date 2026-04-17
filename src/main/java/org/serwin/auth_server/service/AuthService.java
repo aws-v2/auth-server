@@ -9,6 +9,7 @@ import org.serwin.auth_server.entities.User;
 import org.serwin.auth_server.repository.PasswordResetTokenRepository;
 import org.serwin.auth_server.repository.UserRepository;
 import org.serwin.auth_server.util.JwtUtil;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -31,6 +32,9 @@ public class AuthService {
     private final EmailService emailService;
     private final PasswordResetTokenRepository resetTokenRepository;
     private final NatsService natsService;
+
+    @Value("${app.email-verification-enabled:true}")
+    private String emailVerificationEnabled;
 
     public LoginResponse register(RegisterRequest request) {
         log.debug("Processing registration for email: {}", request.getEmail());
@@ -87,8 +91,11 @@ public class AuthService {
 
         // Send verification email
         try {
-            emailService.sendVerificationEmail(user.getEmail(), verificationToken);
-            log.debug("Verification email sent to: {}", user.getEmail());
+
+            if(emailVerificationEnabled.equals("true")){
+                emailService.sendVerificationEmail(user.getEmail(), verificationToken);
+                log.debug("Verification email sent to: {}", user.getEmail());
+            }
         } catch (Exception e) {
             log.error("Failed to send verification email to: {} - Error: {}", user.getEmail(), e.getMessage(), e);
         }
