@@ -31,76 +31,75 @@ public class AuthController {
     private static final Logger auditLog = LoggerFactory.getLogger("AUDIT");
 
     @PostMapping("/register")
-    public ResponseEntity<?> register(@RequestBody RegisterRequest request) {
+    public ResponseEntity<ApiResponse<LoginResponse>> register(@RequestBody RegisterRequest request) {
         log.info("Registration attempt for email: {}", request.getEmail());
         try {
             LoginResponse response = authService.register(request);
-
             auditLog.info("USER_REGISTERED - email={}", request.getEmail());
             log.info("Registration successful for email: {}", request.getEmail());
-            return ResponseEntity.ok(response);
+            return ResponseEntity.ok(ApiResponse.success("User registered successfully", response));
         } catch (Exception e) {
             log.error("Registration failed for email: {} - Error: {}", request.getEmail(), e.getMessage());
             auditLog.warn("REGISTRATION_FAILED - email={}, reason={}", request.getEmail(), e.getMessage());
             return ResponseEntity.status(HttpStatus.BAD_REQUEST)
-                    .body(Map.of("error", e.getMessage()));
+                    .body(ApiResponse.error(HttpStatus.BAD_REQUEST.value(), e.getMessage()));
         }
     }
 
     @PostMapping("/login")
-    public ResponseEntity<?> login(@RequestBody LoginRequest request) {
+    public ResponseEntity<ApiResponse<LoginResponse>> login(@RequestBody LoginRequest request) {
         log.info("Login attempt for email: {}", request.getEmail());
         try {
             LoginResponse response = authService.login(request);
             auditLog.info("USER_LOGIN - email={}, mfaRequired={}", request.getEmail(), response.isMfaRequired());
             log.info("Login successful for email: {}", request.getEmail());
-            return ResponseEntity.ok(response);
+            return ResponseEntity.ok(ApiResponse.success("Login successful", response));
         } catch (Exception e) {
             log.warn("Login failed for email: {} - Error: {}", request.getEmail(), e.getMessage());
             auditLog.warn("LOGIN_FAILED - email={}, reason={}", request.getEmail(), e.getMessage());
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
-                    .body(Map.of("error", e.getMessage()));
+                    .body(ApiResponse.error(HttpStatus.UNAUTHORIZED.value(), e.getMessage()));
         }
     }
 
     @PostMapping("/mfa/verify")
-    public ResponseEntity<?> verifyMfa(@RequestBody MfaVerifyRequest request) {
+    public ResponseEntity<ApiResponse<LoginResponse>> verifyMfa(@RequestBody MfaVerifyRequest request) {
         log.info("MFA verification attempt for email: {}", request.getEmail());
         try {
             LoginResponse response = authService.verifyMfa(request);
             auditLog.info("MFA_VERIFIED - email={}", request.getEmail());
             log.info("MFA verification successful for email: {}", request.getEmail());
-            return ResponseEntity.ok(response);
+            return ResponseEntity.ok(ApiResponse.success("MFA verified successfully", response));
         } catch (Exception e) {
             log.warn("MFA verification failed for email: {} - Error: {}", request.getEmail(), e.getMessage());
             auditLog.warn("MFA_VERIFICATION_FAILED - email={}, reason={}", request.getEmail(), e.getMessage());
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
-                    .body(Map.of("error", e.getMessage()));
+                    .body(ApiResponse.error(HttpStatus.UNAUTHORIZED.value(), e.getMessage()));
         }
     }
 
     @PostMapping("/mfa/enable")
-    public ResponseEntity<?> enableMfa() {
+    public ResponseEntity<ApiResponse<Map<String, Object>>> enableMfa() {
         try {
             String email = getCurrentUserEmail();
             log.info("MFA enable request for email: {}", email);
             Map<String, Object> response = authService.enableMfa(email);
             auditLog.info("MFA_ENABLED - email={}", email);
             log.info("MFA enabled successfully for email: {}", email);
-            return ResponseEntity.ok(response);
+            return ResponseEntity.ok(ApiResponse.success("MFA enabled successfully", response));
         } catch (WriterException | IOException e) {
             log.error("Failed to generate QR code for MFA - Error: {}", e.getMessage(), e);
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-                    .body(Map.of("error", "Failed to generate QR code"));
+                    .body(ApiResponse.error(HttpStatus.INTERNAL_SERVER_ERROR.value(), "Failed to generate QR code"));
         } catch (Exception e) {
             log.error("MFA enable failed - Error: {}", e.getMessage());
             return ResponseEntity.status(HttpStatus.BAD_REQUEST)
-                    .body(Map.of("error", e.getMessage()));
+                    .body(ApiResponse.error(HttpStatus.BAD_REQUEST.value(), e.getMessage()));
         }
     }
 
     @PostMapping("/mfa/disable")
-    public ResponseEntity<?> disableMfa(@RequestBody Map<String, String> request) {
+    public ResponseEntity<ApiResponse<Map<String, String>>> disableMfa(@RequestBody Map<String, String> request) {
         try {
             String email = getCurrentUserEmail();
             String code = request.get("code");
@@ -108,76 +107,76 @@ public class AuthController {
             Map<String, String> response = authService.disableMfa(email, code);
             auditLog.info("MFA_DISABLED - email={}", email);
             log.info("MFA disabled successfully for email: {}", email);
-            return ResponseEntity.ok(response);
+            return ResponseEntity.ok(ApiResponse.success("MFA disabled successfully", response));
         } catch (Exception e) {
             log.warn("MFA disable failed for current user - Error: {}", e.getMessage());
             return ResponseEntity.status(HttpStatus.BAD_REQUEST)
-                    .body(Map.of("error", e.getMessage()));
+                    .body(ApiResponse.error(HttpStatus.BAD_REQUEST.value(), e.getMessage()));
         }
     }
 
     @PostMapping("/forgot-password")
-    public ResponseEntity<?> forgotPassword(@RequestBody ForgotPasswordRequest request) {
+    public ResponseEntity<ApiResponse<Map<String, String>>> forgotPassword(@RequestBody ForgotPasswordRequest request) {
         log.info("Password reset request for email: {}", request.getEmail());
         try {
             Map<String, String> response = authService.forgotPassword(request);
             auditLog.info("PASSWORD_RESET_REQUESTED - email={}", request.getEmail());
             log.info("Password reset email sent to: {}", request.getEmail());
-            return ResponseEntity.ok(response);
+            return ResponseEntity.ok(ApiResponse.success("Password reset email sent", response));
         } catch (Exception e) {
             log.error("Password reset request failed for email: {} - Error: {}", request.getEmail(), e.getMessage());
             return ResponseEntity.status(HttpStatus.BAD_REQUEST)
-                    .body(Map.of("error", e.getMessage()));
+                    .body(ApiResponse.error(HttpStatus.BAD_REQUEST.value(), e.getMessage()));
         }
     }
 
     @PostMapping("/reset-password")
-    public ResponseEntity<?> resetPassword(@RequestBody ResetPasswordRequest request) {
+    public ResponseEntity<ApiResponse<Map<String, String>>> resetPassword(@RequestBody ResetPasswordRequest request) {
         log.info("Password reset confirmation attempt with token");
         try {
             Map<String, String> response = authService.resetPassword(request);
             auditLog.info("PASSWORD_RESET_COMPLETED - token={}", request.getToken().substring(0, 8) + "...");
             log.info("Password reset completed successfully");
-            return ResponseEntity.ok(response);
+            return ResponseEntity.ok(ApiResponse.success("Password reset successful", response));
         } catch (Exception e) {
             log.error("Password reset failed - Error: {}", e.getMessage());
             return ResponseEntity.status(HttpStatus.BAD_REQUEST)
-                    .body(Map.of("error", e.getMessage()));
+                    .body(ApiResponse.error(HttpStatus.BAD_REQUEST.value(), e.getMessage()));
         }
     }
 
     @GetMapping("/verify-email")
-    public ResponseEntity<?> verifyEmail(@RequestParam String token) {
+    public ResponseEntity<ApiResponse<Map<String, String>>> verifyEmail(@RequestParam String token) {
         log.info("Email verification attempt with token: {}...", token.substring(0, 8));
         try {
             Map<String, String> response = authService.verifyEmail(token);
             auditLog.info("EMAIL_VERIFIED - token={}", token.substring(0, 8) + "...");
             log.info("Email verification successful");
-            return ResponseEntity.ok(response);
+            return ResponseEntity.ok(ApiResponse.success("Email verified successfully", response));
         } catch (Exception e) {
             log.warn("Email verification failed - Error: {}", e.getMessage());
             return ResponseEntity.status(HttpStatus.BAD_REQUEST)
-                    .body(Map.of("error", e.getMessage()));
+                    .body(ApiResponse.error(HttpStatus.BAD_REQUEST.value(), e.getMessage()));
         }
     }
 
     @PostMapping("/resend-verification")
-    public ResponseEntity<?> resendVerification(@RequestBody Map<String, String> request) {
+    public ResponseEntity<ApiResponse<Map<String, String>>> resendVerification(@RequestBody Map<String, String> request) {
         String email = request.get("email");
         log.info("Resend verification email request for: {}", email);
         try {
             Map<String, String> response = authService.resendVerificationEmail(email);
             log.info("Verification email resent to: {}", email);
-            return ResponseEntity.ok(response);
+            return ResponseEntity.ok(ApiResponse.success("Verification email resent", response));
         } catch (Exception e) {
             log.error("Resend verification failed for email: {} - Error: {}", email, e.getMessage());
             return ResponseEntity.status(HttpStatus.BAD_REQUEST)
-                    .body(Map.of("error", e.getMessage()));
+                    .body(ApiResponse.error(HttpStatus.BAD_REQUEST.value(), e.getMessage()));
         }
     }
 
     @PostMapping("/logout")
-    public ResponseEntity<?> logout(jakarta.servlet.http.HttpServletRequest request) {
+    public ResponseEntity<ApiResponse<Void>> logout(jakarta.servlet.http.HttpServletRequest request) {
         try {
             String token = extractTokenFromRequest(request);
             String email = getCurrentUserEmail();
@@ -194,11 +193,11 @@ public class AuthController {
 
             auditLog.info("USER_LOGOUT - email={}", email);
             log.info("User logged out successfully: {}", email);
-            return ResponseEntity.ok(Map.of("message", "Logged out successfully"));
+            return ResponseEntity.ok(ApiResponse.success("Logged out successfully", null));
         } catch (Exception e) {
             log.error("Logout failed - Error: {}", e.getMessage());
             return ResponseEntity.status(HttpStatus.BAD_REQUEST)
-                    .body(Map.of("error", e.getMessage()));
+                    .body(ApiResponse.error(HttpStatus.BAD_REQUEST.value(), e.getMessage()));
         }
     }
 
@@ -211,21 +210,21 @@ public class AuthController {
     }
 
     @GetMapping("/me")
-    public ResponseEntity<?> getCurrentUser() {
+    public ResponseEntity<ApiResponse<UserDto>> getCurrentUser() {
         try {
             String email = getCurrentUserEmail();
             log.debug("Fetching current user info for: {}", email);
             UserDto user = authService.getCurrentUser(email);
-            return ResponseEntity.ok(user);
+            return ResponseEntity.ok(ApiResponse.success(user));
         } catch (Exception e) {
             log.error("Failed to fetch current user - Error: {}", e.getMessage());
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
-                    .body(Map.of("error", e.getMessage()));
+                    .body(ApiResponse.error(HttpStatus.UNAUTHORIZED.value(), e.getMessage()));
         }
     }
 
     @PostMapping("/payment/verify")
-    public ResponseEntity<?> verifyPayment(@RequestBody PaymentRequest request) {
+    public ResponseEntity<ApiResponse<Void>> verifyPayment(@RequestBody PaymentRequest request) {
         log.info("Payment verification request received for cardholder: {}", request.getCardholderName());
 
         String subject = String.format("%s.payment.v1.verify.requested", natsService.getEnv());
@@ -236,17 +235,17 @@ public class AuthController {
 
             if (response != null && "SUCCESS".equals(response.getStatus())) {
                 log.info("Payment verification successful: {}", response.getMessage());
-                return ResponseEntity.ok(Map.of("message", response.getMessage()));
+                return ResponseEntity.ok(ApiResponse.success(response.getMessage(), null));
             } else {
                 String errorMsg = response != null ? response.getMessage() : "Payment verification failed or timed out";
                 log.warn("Payment verification failed: {}", errorMsg);
                 return ResponseEntity.status(HttpStatus.BAD_REQUEST)
-                        .body(Map.of("error", errorMsg));
+                        .body(ApiResponse.error(HttpStatus.BAD_REQUEST.value(), errorMsg));
             }
         } catch (Exception e) {
             log.error("Error during payment verification NATS request: {}", e.getMessage());
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-                    .body(Map.of("error", "Internal server error during verification"));
+                    .body(ApiResponse.error(HttpStatus.INTERNAL_SERVER_ERROR.value(), "Internal server error during verification"));
         }
     }
 

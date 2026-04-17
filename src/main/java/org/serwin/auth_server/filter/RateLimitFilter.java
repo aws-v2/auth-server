@@ -7,6 +7,7 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.serwin.auth_server.dto.ApiResponse;
 import org.serwin.auth_server.service.RateLimitingService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -52,10 +53,9 @@ public class RateLimitFilter extends OncePerRequestFilter {
                 response.setStatus(HttpStatus.TOO_MANY_REQUESTS.value());
                 response.setContentType(MediaType.APPLICATION_JSON_VALUE);
 
-                Map<String, Object> errorResponse = Map.of(
-                        "error", "Rate limit exceeded",
-                        "message", "Too many requests. Please try again later.",
-                        "status", HttpStatus.TOO_MANY_REQUESTS.value());
+                ApiResponse<Void> errorResponse = ApiResponse.error(
+                        HttpStatus.TOO_MANY_REQUESTS.value(),
+                        "Too many requests. Please try again later.");
 
                 response.getWriter().write(objectMapper.writeValueAsString(errorResponse));
                 return;
