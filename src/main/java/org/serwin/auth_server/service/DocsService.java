@@ -4,7 +4,7 @@ import java.io.InputStream;
 import java.util.Map;
 
 import org.serwin.auth_server.dto.DocResponse;
-import org.serwin.auth_server.entities.DocType;
+import org.serwin.auth_server.enums.DocType;
 import org.springframework.stereotype.Service;
 import org.yaml.snakeyaml.Yaml;
 

@@ -1,4 +1,4 @@
-package org.serwin.auth_server.entities;
+package org.serwin.auth_server.enums;
 
 public enum DocType {
     PUBLIC,

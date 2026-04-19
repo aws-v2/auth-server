@@ -3,6 +3,7 @@ package org.serwin.auth_server.util;
 import io.jsonwebtoken.Claims;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.serwin.auth_server.enums.Role;
 import org.springframework.test.util.ReflectionTestUtils;
 
 import java.util.UUID;
@@ -27,7 +28,7 @@ class JwtUtilTest {
         String username = "test@example.com";
         UUID userId = UUID.randomUUID();
 
-        String token = jwtUtil.generateToken(username, userId);
+        String token = jwtUtil.generateToken(username, userId, Role.USER);
 
         assertThat(token).isNotNull();
         assertThat(jwtUtil.extractUsername(token)).isEqualTo(username);
@@ -54,7 +55,7 @@ class JwtUtilTest {
     void extractAllClaims_shouldExtractClaimsCorrectly() {
         String username = "test@example.com";
         UUID userId = UUID.randomUUID();
-        String token = jwtUtil.generateToken(username, userId);
+        String token = jwtUtil.generateToken(username, userId, Role.USER);
 
         Claims claims = jwtUtil.extractAllClaims(token);
 

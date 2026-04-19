@@ -95,7 +95,7 @@ class AuthServiceTest {
         void success_returnsTokenAndEmail() {
             when(userRepository.existsByEmail(EMAIL)).thenReturn(false);
             when(passwordEncoder.encode(PASSWORD)).thenReturn(ENCODED_PASSWORD);
-            when(jwtUtil.generateToken(eq(EMAIL), any())).thenReturn("mock-token");
+            when(jwtUtil.generateToken(eq(EMAIL), any(), any())).thenReturn("mock-token");
             stubUserSave();
 
             LoginResponse response = authService.register(registerRequest(EMAIL, PASSWORD, PASSWORD));
@@ -110,7 +110,7 @@ class AuthServiceTest {
         void success_persistsUserWithHashedPasswordAndVerificationToken() {
             when(userRepository.existsByEmail(EMAIL)).thenReturn(false);
             when(passwordEncoder.encode(PASSWORD)).thenReturn(ENCODED_PASSWORD);
-            when(jwtUtil.generateToken(any(), any())).thenReturn("token");
+            when(jwtUtil.generateToken(any(), any(), any())).thenReturn("token");
             stubUserSave();
 
             authService.register(registerRequest(EMAIL, PASSWORD, PASSWORD));
@@ -130,7 +130,7 @@ class AuthServiceTest {
         void success_sendsVerificationEmail() {
             when(userRepository.existsByEmail(EMAIL)).thenReturn(false);
             when(passwordEncoder.encode(PASSWORD)).thenReturn(ENCODED_PASSWORD);
-            when(jwtUtil.generateToken(any(), any())).thenReturn("token");
+            when(jwtUtil.generateToken(any(), any(), any())).thenReturn("token");
             stubUserSave();
 
             authService.register(registerRequest(EMAIL, PASSWORD, PASSWORD));
@@ -142,7 +142,7 @@ class AuthServiceTest {
         void success_publishesNatsUserRegisteredEvent() {
             when(userRepository.existsByEmail(EMAIL)).thenReturn(false);
             when(passwordEncoder.encode(PASSWORD)).thenReturn(ENCODED_PASSWORD);
-            when(jwtUtil.generateToken(any(), any())).thenReturn("token");
+            when(jwtUtil.generateToken(any(), any(), any())).thenReturn("token");
             stubUserSave();
 
             authService.register(registerRequest(EMAIL, PASSWORD, PASSWORD));
@@ -165,7 +165,7 @@ class AuthServiceTest {
             // Email sending is wrapped in try/catch — failure must not bubble up
             when(userRepository.existsByEmail(EMAIL)).thenReturn(false);
             when(passwordEncoder.encode(PASSWORD)).thenReturn(ENCODED_PASSWORD);
-            when(jwtUtil.generateToken(any(), any())).thenReturn("token");
+            when(jwtUtil.generateToken(any(), any(), any())).thenReturn("token");
             stubUserSave();
             doThrow(new RuntimeException("SMTP unavailable"))
                     .when(emailService).sendVerificationEmail(any(), any());
@@ -178,7 +178,7 @@ class AuthServiceTest {
         void success_natsFailure_doesNotPreventRegistration() {
             when(userRepository.existsByEmail(EMAIL)).thenReturn(false);
             when(passwordEncoder.encode(PASSWORD)).thenReturn(ENCODED_PASSWORD);
-            when(jwtUtil.generateToken(any(), any())).thenReturn("token");
+            when(jwtUtil.generateToken(any(), any(), any())).thenReturn("token");
             stubUserSave();
             doThrow(new RuntimeException("NATS down"))
                     .when(natsService).publish(any(), any(), any());
@@ -218,7 +218,7 @@ class AuthServiceTest {
         void success_returnsToken() {
             when(userRepository.findByEmail(EMAIL)).thenReturn(Optional.of(baseUser));
             when(passwordEncoder.matches(PASSWORD, ENCODED_PASSWORD)).thenReturn(true);
-            when(jwtUtil.generateToken(EMAIL, baseUser.getId())).thenReturn("jwt");
+            when(jwtUtil.generateToken(EMAIL, baseUser.getId(), baseUser.getRole())).thenReturn("jwt");
 
             LoginResponse response = authService.login(loginRequest(EMAIL, PASSWORD));
 
@@ -376,7 +376,7 @@ class AuthServiceTest {
             User u = mfaUser();
             when(userRepository.findByEmail(EMAIL)).thenReturn(Optional.of(u));
             when(mfaService.verifyCode("MFA-SECRET", "123456")).thenReturn(true);
-            when(jwtUtil.generateToken(EMAIL, u.getId())).thenReturn("full-jwt");
+            when(jwtUtil.generateToken(EMAIL, u.getId(), u.getRole())).thenReturn("full-jwt");
 
             LoginResponse response = authService.verifyMfa(emailRequest(EMAIL, "123456"));
 
@@ -390,7 +390,7 @@ class AuthServiceTest {
             User u = mfaUser();
             when(userRepository.findById(u.getId())).thenReturn(Optional.of(u));
             when(mfaService.verifyCode("MFA-SECRET", "654321")).thenReturn(true);
-            when(jwtUtil.generateToken(EMAIL, u.getId())).thenReturn("full-jwt");
+            when(jwtUtil.generateToken(EMAIL, u.getId(), u.getRole())).thenReturn("full-jwt");
 
             LoginResponse response = authService.verifyMfa(userIdRequest(u.getId().toString(), "654321"));
 

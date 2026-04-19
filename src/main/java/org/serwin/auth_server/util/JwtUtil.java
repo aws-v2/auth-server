@@ -4,6 +4,8 @@ import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.io.Decoders;
 import io.jsonwebtoken.security.Keys;
+
+import org.serwin.auth_server.enums.Role;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
@@ -18,9 +20,10 @@ public class JwtUtil {
     @Value("${jwt.expiration:86400000}") // Default 24h
     private long jwtExpiration;
 
-    public String generateToken(String username, java.util.UUID userId) {
+    public String generateToken(String username, java.util.UUID userId, Role role) {
         java.util.Map<String, Object> claims = new java.util.HashMap<>();
         claims.put("userId", userId.toString());
+        claims.put("role", role.toString());
         return createToken(claims, username);
     }
 
