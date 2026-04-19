@@ -8,7 +8,7 @@
 
   "categories": [
     {
-      "title": "Getting Started",
+      "title": "Getting Started...",
       "items": [
         { "title": "Authentication System Overview", "slug": "iam-overview" },
         { "title": "Auth Quickstart Guide", "slug": "iam-quickstart" }
