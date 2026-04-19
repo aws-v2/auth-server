@@ -52,6 +52,10 @@ public class SecurityConfig {
                                 "/api/v1/auth/mfa/verify"))
                         .permitAll()
                         .requestMatchers(new org.springframework.security.web.util.matcher.AntPathRequestMatcher(
+                                "/api/v1/auth/docs/**"))
+                        .permitAll()
+
+                        .requestMatchers(new org.springframework.security.web.util.matcher.AntPathRequestMatcher(
                                 "/api/v1/auth/forgot-password"))
                         .permitAll()
                         .requestMatchers(new org.springframework.security.web.util.matcher.AntPathRequestMatcher(

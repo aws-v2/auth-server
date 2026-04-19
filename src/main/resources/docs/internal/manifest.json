@@ -1,5 +1,5 @@
 {
-  "service": "auth-service",
+  "service": "auth-service-internal",
   "version": "V1",
   "type": "internal-docs",
   "description": "Internal engineering documentation for the Auth service. Covers authentication flows, user management, API keys, token handling, and identity security mechanisms.",
