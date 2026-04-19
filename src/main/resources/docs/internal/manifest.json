@@ -1,0 +1,25 @@
+{
+  "service": "auth-service",
+  "version": "V1",
+  "type": "internal-docs",
+  "description": "Internal engineering documentation for the Auth service. Covers authentication flows, user management, API keys, token handling, and identity security mechanisms.",
+  "audience": "engineers",
+  "visibility": "internal-only",
+
+  "categories": [
+    {
+      "title": "Getting Started",
+      "items": [
+        { "title": "Authentication System Overview", "slug": "iam-overview" },
+        { "title": "Auth Quickstart Guide", "slug": "iam-quickstart" }
+      ]
+    },
+    {
+      "title": "Users & Authentication",
+      "items": [
+        { "title": "User Accounts & Identity", "slug": "iam-users" },
+        { "title": "API Keys & Access Tokens", "slug": "iam-api-keys" }
+      ]
+    }
+  ]
+}
