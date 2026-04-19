@@ -10,6 +10,8 @@ import jakarta.validation.constraints.NotBlank;
 
 import java.util.UUID;
 
+import org.serwin.auth_server.enums.Role;
+
 @Entity
 @Table(name = "users")
 @Data
@@ -38,6 +40,9 @@ private String email;
 
     @Column(name = "email_verified")
     private boolean emailVerified = false;
+
+    @Column(name = "role")
+    private Role role = Role.USER;
 
     @Column(name = "verification_token")
     private String verificationToken;

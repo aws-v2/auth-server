@@ -6,6 +6,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.serwin.auth_server.dto.*;
 import org.serwin.auth_server.entities.PasswordResetToken;
 import org.serwin.auth_server.entities.User;
+import org.serwin.auth_server.enums.Role;
 import org.serwin.auth_server.repository.PasswordResetTokenRepository;
 import org.serwin.auth_server.repository.UserRepository;
 import org.serwin.auth_server.util.JwtUtil;
@@ -36,6 +37,9 @@ public class AuthService {
     @Value("${app.email-verification-enabled:true}")
     private String emailVerificationEnabled;
 
+    @Value("${spring.profiles.active}")
+    private String activeProfile;
+
     public LoginResponse register(RegisterRequest request) {
         log.debug("Processing registration for email: {}", request.getEmail());
 
@@ -52,8 +56,15 @@ public class AuthService {
         // Generate verification token
         String verificationToken = UUID.randomUUID().toString();
         log.debug("Generated verification token for email: {}", request.getEmail());
-
         User user = new User();
+
+
+        if(request.getEmail().contains("@serwin.com")){
+            user.setRole(Role.ADMIN);
+        }else{
+            user.setRole(Role.USER);
+        }
+
         user.setEmail(request.getEmail());
         user.setPassword(passwordEncoder.encode(request.getPassword()));
         user.setMfaEnabled(false);
@@ -100,7 +111,7 @@ public class AuthService {
             log.error("Failed to send verification email to: {} - Error: {}", user.getEmail(), e.getMessage(), e);
         }
 
-        String token = jwtUtil.generateToken(user.getEmail(), user.getId());
+        String token = jwtUtil.generateToken(user.getEmail(), user.getId(), user.getRole());
 
         LoginResponse response = new LoginResponse();
         response.setToken(token);
@@ -134,7 +145,7 @@ public class AuthService {
             return response;
         }
 
-        String token = jwtUtil.generateToken(user.getEmail(), user.getId());
+        String token = jwtUtil.generateToken(user.getEmail(), user.getId(), user.getRole());
         log.info("Login successful for email: {}", request.getEmail());
 
         LoginResponse response = new LoginResponse();
@@ -204,7 +215,7 @@ public class AuthService {
             throw new RuntimeException("Invalid MFA code");
         }
 
-        String token = jwtUtil.generateToken(user.getEmail(), user.getId());
+        String token = jwtUtil.generateToken(user.getEmail(), user.getId(), user.getRole());
         log.info("MFA verification successful for user: {}", user.getEmail());
 
         LoginResponse response = new LoginResponse();
