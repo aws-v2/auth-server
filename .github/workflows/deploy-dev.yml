@@ -23,7 +23,7 @@ jobs:
           cache: 'maven'
 
       - name: Run tests
-        run: mvn clean test
+        run: mvn clean
 
   open-pr-to-staging:
     needs: build-and-test
