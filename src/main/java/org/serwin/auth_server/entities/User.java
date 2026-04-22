@@ -41,6 +41,7 @@ private String email;
     @Column(name = "email_verified")
     private boolean emailVerified = false;
 
+    @Enumerated(EnumType.STRING)
     @Column(name = "role")
     private Role role = Role.USER;
 
