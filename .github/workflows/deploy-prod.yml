@@ -24,7 +24,7 @@ jobs:
           java-version: '17'
           cache: 'maven'
 
-      - name: Run tests
+      - name: Run prod tests
         run: mvn clean
 
   prod-build-and-push:
