@@ -72,7 +72,7 @@ jobs:
           key: ${{ secrets.PROD_SSH_KEY }}
           script: |
             docker network create aws-prod-network || true
-            echo "Pulling latest image......"
+            echo "Pulling latest image....
 
             docker pull qarani/auth-server:prod
             docker stop auth-server-prod || true
