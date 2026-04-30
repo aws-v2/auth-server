@@ -1,5 +1,5 @@
 server:
-  port: ${AUTH_SERVICE_PORT}
+  port: ${SERVER_PORT:8081}
   shutdown: graceful
   compression:
     enabled: true
