@@ -72,9 +72,15 @@ jobs:
           key: ${{ secrets.PROD_SSH_KEY }}
           script: |
             docker network create aws-prod-network || true
+            echo "Pulling latest image......"
+
             docker pull qarani/auth-server:prod
             docker stop auth-server-prod || true
-            docker rm auth-server-prod || true
+            echo "Removing old service....."
+
+            docker service rm auth-server-prod || true
+            echo "Deploying new service....."
+
             docker run -d --name auth-server-prod \
               --network aws-prod-network \
               -p 8081:8081 \
