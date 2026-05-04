@@ -9,6 +9,7 @@ import org.serwin.auth_server.entities.User;
 import org.serwin.auth_server.enums.Role;
 import org.serwin.auth_server.repository.PasswordResetTokenRepository;
 import org.serwin.auth_server.repository.UserRepository;
+import org.serwin.auth_server.util.HeaderUtils;
 import org.serwin.auth_server.util.JwtUtil;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -61,7 +62,10 @@ public class AuthService {
 
         if(request.getEmail().contains("@serwin.com")){
             user.setRole(Role.ADMIN);
-        }else{
+        }else if(HeaderUtils.getHeader("X-Request-Source").equals("web-gamelift")){
+            user.setRole(Role.GAMER);
+        }
+        else{
             user.setRole(Role.USER);
         }
 

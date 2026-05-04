@@ -4,5 +4,6 @@ public enum Role {
     ADMIN,
     ENGINEER,
     USER,
-    SERVICE
+    SERVICE,
+    GAMER
 }
