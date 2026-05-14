@@ -10,5 +10,5 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @Builder
 public class AccessKeyResolveRequest {
-    private String accessKeyId;
+    private String apiKey;
 }

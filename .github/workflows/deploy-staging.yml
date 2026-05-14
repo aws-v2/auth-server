@@ -49,7 +49,9 @@ jobs:
       with:
         context: .
         push: true
-        tags: qarani/auth-server:staging
+        tags: |
+            qarani/auth-server:staging
+            qarani/auth-server:staging-${{ github.sha }}
         build-args: |
           SPRING_PROFILES_ACTIVE=staging
 
@@ -73,7 +75,7 @@ jobs:
           key: ${{ secrets.STAGING_SSH_KEY }}
           script: |
             docker network create aws-staging-network || true
-            docker pull qarani/auth-server:staging
+            docker pull qarani/auth-server:staging-${{ github.sha }}
             docker stop auth-server-staging || true
             docker rm auth-server-staging || true
             docker run -d --name auth-server-staging \
@@ -96,7 +98,7 @@ jobs:
               -e STAGING_MAIL_PASSWORD="cbhs oyci khfa psij" \
               -e EUREKA_SERVER_URL=http://discovery-server-staging:8761/eureka/ \
               -e STAGING_EMAIL_VERIFICATION_ENABLED=false \
-              qarani/auth-server:staging
+              qarani/auth-server:staging-${{ github.sha }}
 
   open-pr-to-main:
     needs: deploy

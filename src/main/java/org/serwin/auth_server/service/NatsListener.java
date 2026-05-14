@@ -40,13 +40,13 @@ public class NatsListener {
         Dispatcher dispatcher = conn.createDispatcher(msg -> {
             try {
                 AccessKeyResolveRequest request = objectMapper.readValue(msg.getData(), AccessKeyResolveRequest.class);
-                log.debug("Received Access Key resolution request for: {}", request.getAccessKeyId());
+                log.debug("Received Access Key resolution request for: {}", request.getApiKey());
 
-                AccessKeyResolveResponse response = apiKeyService.resolveApiKey(request.getAccessKeyId());
+                AccessKeyResolveResponse response = apiKeyService.resolveApiKey(request.getApiKey());
                 byte[] responseData = objectMapper.writeValueAsBytes(response);
 
                 conn.publish(msg.getReplyTo(), responseData);
-                log.debug("Replied to resolution request for: {}", request.getAccessKeyId());
+                log.debug("Replied to resolution request for: {}", request.getApiKey());
             } catch (Exception e) {
                 log.error("Failed to handle Access Key resolution request: {}", e.getMessage());
             }

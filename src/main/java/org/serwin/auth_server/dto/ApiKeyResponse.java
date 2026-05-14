@@ -10,19 +10,18 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @AllArgsConstructor
 public class ApiKeyResponse {
-    private String id;
-    private String accessKeyId;
-    private String secretAccessKey; // Only on creation
-    private String name;
-    private String description;
-    private String[] allowedActions;
-    private String[] allowedResources;
-    private boolean enabled;
-    private String createdAt;
-    private String expiresAt;
-    private String lastUsedAt;
-    private String userId; // For NATS internal
-    private String secretKeyHash; // For NATS internal
-    private String warning; // "Save this secret - cannot be retrieved again"
 
+    private String id;
+
+    private String apiKey;
+ 
+    private String name;
+
+    private boolean enabled;
+
+    private String createdAt;
+
+    private String userId;
+
+    private String warning;
 }

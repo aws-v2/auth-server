@@ -1,3 +1,14 @@
+error id: file://<WORKSPACE>/src/main/java/org/serwin/auth_server/service/AuthService.java:_empty_/authService#
+file://<WORKSPACE>/src/main/java/org/serwin/auth_server/service/AuthService.java
+empty definition using pc, found symbol in pc: _empty_/authService#
+empty definition using semanticdb
+empty definition using fallback
+non-local guesses:
+
+offset: 17391
+uri: file://<WORKSPACE>/src/main/java/org/serwin/auth_server/service/AuthService.java
+text:
+```scala
 package org.serwin.auth_server.service;
 
 import com.google.zxing.WriterException;
@@ -21,13 +32,7 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Objects;
 import java.util.UUID;
-import java.nio.charset.StandardCharsets;
-import java.security.MessageDigest;
-import java.time.Instant;
-import java.util.Base64;
 
-import javax.crypto.Mac;
-import javax.crypto.spec.SecretKeySpec;
 @Service
 @RequiredArgsConstructor
 @Slf4j
@@ -46,8 +51,6 @@ public class AuthService {
 
     @Value("${spring.profiles.active}")
     private String activeProfile;
-    @Value("${jwt.secret:404E635266556A586E3272357538782F413F4428472B4B6250645367566B5970}")
-    private String secret;
 
     public LoginResponse register(RegisterRequest request) {
         log.debug("Processing registration for email: {}", request.getEmail());
@@ -417,7 +420,15 @@ public class AuthService {
             userDto.setVerificationToken(user.getVerificationToken());
         }
 
+        @@authService.listUserApiKeys(user.getEmail())
 
         return userDto;
     }
 }
+
+```
+
+
+#### Short summary: 
+
+empty definition using pc, found symbol in pc: _empty_/authService#

@@ -6,11 +6,10 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import  java.util.List;
 
 @Data
 @NoArgsConstructor
-@AllArgsConstructor
-@Builder
 public class UserDto {
     private UUID id;
     private String email;
@@ -23,6 +22,7 @@ public class UserDto {
 
     
 
+
  
     public UserDto(UUID id, String email, boolean mfaEnabled, boolean emailVerified, LocalDateTime createdAt) {
         this.id = id;
@@ -31,6 +31,9 @@ public class UserDto {
         this.emailVerified = emailVerified;
         this.createdAt = createdAt;
     }
+
+
+    
 
  
 

@@ -11,9 +11,12 @@ import org.serwin.auth_server.repository.ApiKeyRepository;
 import org.serwin.auth_server.repository.UserRepository;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+
+import jakarta.annotation.PostConstruct;
 
 import java.security.SecureRandom;
 import java.time.LocalDateTime;
@@ -22,90 +25,128 @@ import java.util.Base64;
 import java.util.List;
 import java.util.UUID;
 import java.util.stream.Collectors;
+import java.nio.charset.StandardCharsets;
+import java.security.MessageDigest;
+import java.time.Instant;
+import java.util.Base64;
+
+import javax.crypto.Mac;
+import javax.crypto.spec.SecretKeySpec;
 
 @Service
 @RequiredArgsConstructor
 @Slf4j
 public class ApiKeyService {
     private static final Logger auditLog = LoggerFactory.getLogger("AUDIT");
-
+    @Value("${jwt.secret:367566B5970}")
+    private String secret;
     private final ApiKeyRepository apiKeyRepository;
     private final UserRepository userRepository;
     private final PasswordEncoder passwordEncoder;
 
-    @Transactional
-    public ApiKeyResponse generateApiKey(String email, CreateApiKeyRequest request) {
-        log.info("Generating API key for user: {}, name: {}", email, request.getName());
 
-        User user = userRepository.findByEmail(email)
-                .orElseThrow(() -> {
-                    log.error("User not found while generating API key: {}", email);
-                    return new RuntimeException("User not found");
-                });
+@PostConstruct
+public void debugSecret() {
+    log.info("[SECRET CHECK] class={} length={} first8='{}' last8='{}'",
+        getClass().getSimpleName(),
+        secret.length(),
+        secret.substring(0, Math.min(8, secret.length())),
+        secret.substring(Math.max(0, secret.length() - 8))
+    );
+}
 
-        if (!user.isEmailVerified()) {
-            log.warn("API key creation attempted by unverified user: {}", email);
-            throw new RuntimeException("Email must be verified to create API keys");
-        }
+public String generateApiKey(String userId, CreateApiKeyRequest request) {
+debugSecret();
 
-        // Generate Access Key ID
-        String accessKeyId = "AKIA" + generateRandomAlphanumeric(16);
-        while (apiKeyRepository.existsByAccessKeyId(accessKeyId)) {
-            log.debug("Access key ID collision, regenerating");
-            accessKeyId = "AKIA" + generateRandomAlphanumeric(16);
-        }
+    try {
 
-        // Generate Secret Key
-        byte[] secretBytes = new byte[30];
-        new SecureRandom().nextBytes(secretBytes);
-        String secretAccessKey = Base64.getEncoder().encodeToString(secretBytes);
+        User user = userRepository.findById(UUID.fromString(userId))
+                .orElseThrow(() -> new RuntimeException("User not found"));
 
-        // Hash Secret
-        String secretHash = passwordEncoder.encode(secretAccessKey);
+        // unique random value
+        String keyId = UUID.randomUUID()
+                .toString()
+                .replace("-", "");
 
-        LocalDateTime expiresAt = null;
-        if (request.getExpiresAt() != null) {
-            expiresAt = LocalDateTime.parse(request.getExpiresAt(), DateTimeFormatter.ISO_DATE_TIME);
-            log.debug("API key will expire at: {}", expiresAt);
-        }
+        // payload
+        String payload = userId + ":" + keyId;
 
+        // encode payload
+        String encodedPayload = Base64.getUrlEncoder()
+                .withoutPadding()
+                .encodeToString(
+                        payload.getBytes(StandardCharsets.UTF_8)
+                );
+
+        // sign encoded payload
+        String signature = hmacSign(encodedPayload);
+
+        /*
+         * FINAL API KEY FORMAT:
+         *
+         * ak_<payload>.<signature>
+         *
+         * example:
+         * ak_YWJjMTIzOmRlZjQ1Ng.xxxxxxxx
+         */
+        String apiKeyValue = "ak_" + encodedPayload + "." + signature;
+
+        // save api key metadata
         ApiKey apiKey = new ApiKey();
+
         apiKey.setUser(user);
-        apiKey.setAccessKeyId(accessKeyId);
-        apiKey.setSecretKeyHash(secretHash);
+
+        // store the full api key
+        apiKey.setApiKey(apiKeyValue);
+
         apiKey.setName(request.getName());
-        apiKey.setDescription(request.getDescription());
-        apiKey.setAllowedActions(request.getAllowedActions());
-        apiKey.setAllowedResources(request.getAllowedResources());
-        apiKey.setExpiresAt(expiresAt);
+        apiKey.setEnabled(true);
+        apiKey.setCreatedAt(LocalDateTime.now());
 
         apiKeyRepository.save(apiKey);
-        auditLog.info("API_KEY_CREATED - email={}, accessKeyId={}, name={}", email, accessKeyId, request.getName());
-        log.info("API key created successfully for user: {}, accessKeyId: {}", email, accessKeyId);
 
-        ApiKeyResponse response = new ApiKeyResponse();
-        response.setId(apiKey.getId().toString());
-        response.setAccessKeyId(accessKeyId);
-        response.setSecretAccessKey(secretAccessKey);
-        response.setUserId(user.getId().toString()); // Set User ID
-        response.setSecretKeyHash(secretHash); // Set Hash for NATS
-        response.setName(apiKey.getName());
+        return apiKeyValue;
 
-        response.setDescription(apiKey.getDescription());
-        response.setAllowedActions(apiKey.getAllowedActions());
-        response.setAllowedResources(apiKey.getAllowedResources());
-        response.setEnabled(apiKey.isEnabled());
-        response.setCreatedAt(apiKey.getCreatedAt().toString());
-        response.setExpiresAt(expiresAt != null ? expiresAt.toString() : null);
-        response.setWarning("Save this secret key now. You cannot retrieve it again.");
-        return response;
+    } catch (Exception e) {
+
+        log.error("Failed to generate API key", e);
+
+        throw new RuntimeException(
+                "Failed to generate API key",
+                e
+        );
     }
+}
+private String hmacSign(String data) {
+    try {
+
+        Mac mac = Mac.getInstance("HmacSHA256");
+
+        SecretKeySpec secretKeySpec = new SecretKeySpec(
+                secret.getBytes(StandardCharsets.UTF_8),
+                "HmacSHA256"
+        );
+
+        mac.init(secretKeySpec);
+
+        byte[] hash = mac.doFinal(data.getBytes(StandardCharsets.UTF_8));
+
+        return Base64.getUrlEncoder()
+                .withoutPadding()
+                .encodeToString(hash);
+
+    } catch (Exception e) {
+        throw new RuntimeException("Failed to sign API key", e);
+    }
+}
+
+ 
 
     @Transactional(readOnly = true)
     public List<ApiKeyResponse> listUserApiKeys(String email) {
         log.debug("Listing API keys for user: {}", email);
 
-        User user = userRepository.findByEmail(email)
+        User user = userRepository.findById(UUID.fromString(email))
                 .orElseThrow(() -> {
                     log.error("User not found while listing API keys: {}", email);
                     return new RuntimeException("User not found");
@@ -136,9 +177,9 @@ public class ApiKeyService {
 
         apiKey.setEnabled(false);
         apiKeyRepository.save(apiKey);
-        auditLog.info("API_KEY_REVOKED - email={}, accessKeyId={}, keyId={}", email, apiKey.getAccessKeyId(), id);
-        log.info("API key revoked successfully: {} for user: {}", apiKey.getAccessKeyId(), email);
-        return apiKey.getAccessKeyId();
+        auditLog.info("API_KEY_REVOKED - email={}, apiKey={}, keyId={}", email, apiKey.getApiKey(), id);
+        log.info("API key revoked successfully: {} for user: {}", apiKey.getApiKey(), email);
+        return apiKey.getApiKey();
     }
 
     @Transactional
@@ -157,54 +198,53 @@ public class ApiKeyService {
         }
 
         apiKeyRepository.delete(apiKey);
-        auditLog.info("API_KEY_DELETED - email={}, accessKeyId={}, keyId={}", email, apiKey.getAccessKeyId(), id);
-        log.info("API key deleted successfully: {} for user: {}", apiKey.getAccessKeyId(), email);
+        auditLog.info("API_KEY_DELETED - email={}, apiKey={}, keyId={}", email, apiKey.getApiKey(), id);
+        log.info("API key deleted successfully: {} for user: {}", apiKey.getApiKey(), email);
     }
 
     @Transactional
-    public void updateLastUsed(String accessKeyId) {
-        log.trace("Updating last used timestamp for API key: {}", accessKeyId);
-        apiKeyRepository.findByAccessKeyId(accessKeyId).ifPresent(key -> {
-            key.setLastUsedAt(LocalDateTime.now());
+    public void updateLastUsed(String apiKeyVal) {
+        log.trace("Updating last used timestamp for API key: {}", apiKeyVal);
+        apiKeyRepository.findByApiKey(apiKeyVal).ifPresent(key -> {
             apiKeyRepository.save(key);
-            log.debug("Updated last used timestamp for API key: {}", accessKeyId);
+            log.debug("Updated last used timestamp for API key: {}", apiKeyVal);
         });
     }
 
     @Transactional(readOnly = true)
-    public AccessKeyResolveResponse resolveApiKey(String accessKeyId) {
-        log.debug("Resolving API key: {}", accessKeyId);
+    public AccessKeyResolveResponse resolveApiKey(String apiKeyVal) {
+        log.debug("Resolving API key: {}", apiKeyVal);
 
-        return apiKeyRepository.findByAccessKeyId(accessKeyId)
-                .map(key -> {
-                    log.debug("Resolved accessKeyId: {} to userId: {}", accessKeyId, key.getUser().getId());
-                    return AccessKeyResolveResponse.builder()
-                            .userId(key.getUser().getId().toString())
-                            .secretKeyHash(key.getSecretKeyHash())
-                            .enabled(key.isEnabled() && !key.isExpired())
-                            .build();
-                })
-                .orElseGet(() -> {
-                    log.warn("API key not found: {}", accessKeyId);
-                    return AccessKeyResolveResponse.builder().build();
-                });
-    }
+ return apiKeyRepository.findByApiKey(apiKeyVal)
+        .map(key -> {
+            log.debug("Resolved apiKey: {} to userId: {}", apiKeyVal, key.getUser().getId());
 
-    private ApiKeyResponse mapToResponse(ApiKey key) {
-        ApiKeyResponse response = new ApiKeyResponse();
-        response.setId(key.getId().toString());
-        response.setAccessKeyId(key.getAccessKeyId());
-        // No secret key
-        response.setName(key.getName());
-        response.setDescription(key.getDescription());
-        response.setAllowedActions(key.getAllowedActions());
-        response.setAllowedResources(key.getAllowedResources());
-        response.setEnabled(key.isEnabled());
-        response.setCreatedAt(key.getCreatedAt().toString());
-        response.setExpiresAt(key.getExpiresAt() != null ? key.getExpiresAt().toString() : null);
-        response.setLastUsedAt(key.getLastUsedAt() != null ? key.getLastUsedAt().toString() : null);
-        return response;
-    }
+            return AccessKeyResolveResponse.builder()
+                    .userId(key.getUser().getId().toString())
+                    .enabled(key.isEnabled())
+                    .build();
+        })
+        .orElseGet(() -> {
+            log.warn("API key not found: {}", apiKeyVal);
+            return AccessKeyResolveResponse.builder().build();
+        });
+}
+
+private ApiKeyResponse mapToResponse(ApiKey key) {
+    ApiKeyResponse response = new ApiKeyResponse();
+
+    response.setId(key.getId().toString());
+    response.setApiKey(key.getApiKey());
+    response.setName(key.getName());
+    response.setEnabled(key.isEnabled());
+    response.setCreatedAt(
+            key.getCreatedAt() != null
+                    ? key.getCreatedAt().toString()
+                    : null
+    );
+
+    return response;
+}
 
     private String generateRandomAlphanumeric(int length) {
         String chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
