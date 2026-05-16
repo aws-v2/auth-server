@@ -1,3 +1,14 @@
+error id: file://<WORKSPACE>/src/main/java/org/serwin/auth_server/service/AuthService.java:_empty_/TenantCreatedEvent#
+file://<WORKSPACE>/src/main/java/org/serwin/auth_server/service/AuthService.java
+empty definition using pc, found symbol in pc: _empty_/TenantCreatedEvent#
+empty definition using semanticdb
+empty definition using fallback
+non-local guesses:
+
+offset: 3590
+uri: file://<WORKSPACE>/src/main/java/org/serwin/auth_server/service/AuthService.java
+text:
+```scala
 package org.serwin.auth_server.service;
 
 import com.google.zxing.WriterException;
@@ -89,7 +100,7 @@ public class AuthService {
         // Publish Registration Events to NATS
         try {
             // 1. Publish TenantCreated event (formal)
-            TenantCreatedEvent tenantEvent = TenantCreatedEvent.builder()
+            TenantCreat@@edEvent tenantEvent = TenantCreatedEvent.builder()
                     .event_id(UUID.randomUUID())
                     .event_type("tenant.created")
                     .tenant_id(user.getId())
@@ -421,3 +432,10 @@ public class AuthService {
         return userDto;
     }
 }
+
+```
+
+
+#### Short summary: 
+
+empty definition using pc, found symbol in pc: _empty_/TenantCreatedEvent#

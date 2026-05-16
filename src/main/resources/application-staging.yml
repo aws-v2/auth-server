@@ -16,6 +16,11 @@ nats:
   url: nats://${STAGING_NATS_URL:nats-staging:4222}
   username: ${STAGING_NATS_USERNAME:nats-staging-user}
   password: ${STAGING_NATS_PASSWORD:nats-staging-password}
+  prefix: ${STAGING_NATS_PREFIX:staging.v1}
+system-user:
+  email: ${STAGING_SYSTEM_USER_EMAIL:system@internal.local}
+  password: ${STAGING_SYSTEM_USER_PASSWORD:change-me}
+  id: ${STAGING_SYSTEM_USER_ID:00000000-0000-0000-0000-000000000000}
 
 app:
   email-verification-enabled: ${STAGING_EMAIL_VERIFICATION_ENABLED:false}

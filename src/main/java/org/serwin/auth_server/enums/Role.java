@@ -5,5 +5,8 @@ public enum Role {
     ENGINEER,
     USER,
     SERVICE,
-    GAMER
+    GAMER,
+    SYSTEM  
 }
+
+  

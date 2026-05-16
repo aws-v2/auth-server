@@ -16,9 +16,16 @@ nats:
   url: ${DEV_NATS_URL:nats://localhost:4222}
   username: ${DEV_NATS_USERNAME:auth-server}
   password: ${DEV_NATS_PASSWORD:auth-secret}
+  prefix: ${DEV_NATS_PREFIX:dev.v1}
+
 
 app:
   email-verification-enabled: ${DEV_EMAIL_VERIFICATION_ENABLED:false}
+
+system-user:
+  email: ${DEV_SYSTEM_USER_EMAIL:system@internal.local}
+  password: ${DEV_SYSTEM_USER_PASSWORD:change-me}
+  id: ${DEV_SYSTEM_USER_ID:00000000-0000-0000-0000-000000000000}
 
 spring:
   application:

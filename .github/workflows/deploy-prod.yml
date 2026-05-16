@@ -101,6 +101,7 @@ jobs:
               --env PROD_MAIL_PORT=587 \
               --env PROD_MAIL_USERNAME=emqarani@gmail.com \
               --env PROD_MAIL_PASSWORD="cbhs oyci khfa psij" \
+              -e DEV_NATS_PREFIX=prod.v1 \
               --env EUREKA_SERVER_URL=http://discovery-server-prod:8761/eureka/ \
               --env PROD_EMAIL_VERIFICATION_ENABLED=false \
               qarani/auth-server:prod-${{ github.sha }}

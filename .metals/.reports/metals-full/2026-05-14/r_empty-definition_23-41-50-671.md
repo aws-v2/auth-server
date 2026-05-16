@@ -1,3 +1,14 @@
+error id: file://<WORKSPACE>/src/main/java/org/serwin/auth_server/service/NatsService.java:_empty_/Connection#getStatus#
+file://<WORKSPACE>/src/main/java/org/serwin/auth_server/service/NatsService.java
+empty definition using pc, found symbol in pc: _empty_/Connection#getStatus#
+empty definition using semanticdb
+empty definition using fallback
+non-local guesses:
+
+offset: 2878
+uri: file://<WORKSPACE>/src/main/java/org/serwin/auth_server/service/NatsService.java
+text:
+```scala
 package org.serwin.auth_server.service;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -31,12 +42,6 @@ public class NatsService {
     @Value("${spring.profiles.active:dev}")
     private String env;
 
-
-    @Value("${nats.prefix:dev.v1}")
-    private String natsPrefix;
-
-
-
     private final ObjectMapper objectMapper;
     private Connection natsConnection;
 
@@ -69,8 +74,9 @@ public class NatsService {
             log.warn("NATS not connected, skipping publish to domain: {}", domain);
             return;
         }
-log.debug("Publishing event to domain: {}, action: {} in env: {}", domain, action,natsPrefix);
-        String subject = String.format("%s.%s.%s", natsPrefix, domain, action);
+log.debug("Publishing event to domain: {}, action: {} in env: {}", domain, action,env);
+        String subject = String.format("%s.auth.v1.%s.%s", env, domain, action);
+
         try {
             String json = objectMapper.writeValueAsString(payload);
             natsConnection.publish(subject, json.getBytes());
@@ -84,7 +90,7 @@ log.debug("Publishing event to domain: {}, action: {} in env: {}", domain, actio
      * Synchronous request-reply method.
      */
     public <T> T request(String subject, Object payload, Class<T> responseType) {
-        if (natsConnection == null || natsConnection.getStatus() != Connection.Status.CONNECTED) {
+        if (natsConnection == null || natsConnection.getStatu@@s() != Connection.Status.CONNECTED) {
             log.warn("NATS not connected, skipping request to subject: {}", subject);
             return null;
         }
@@ -117,3 +123,10 @@ log.debug("Publishing event to domain: {}, action: {} in env: {}", domain, actio
         return natsConnection;
     }
 }
+
+```
+
+
+#### Short summary: 
+
+empty definition using pc, found symbol in pc: _empty_/Connection#getStatus#

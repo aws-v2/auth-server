@@ -16,10 +16,16 @@ nats:
   url: ${PROD_NATS_URL}
   username: ${PROD_NATS_USERNAME}
   password: ${PROD_NATS_PASSWORD}
+  prefix: ${PROD_NATS_PREFIX:prod.v1}
+
 app:
   email-verification-enabled: ${PROD_EMAIL_VERIFICATION_ENABLED:false}
 
-  
+system-user:
+  email: ${PROD_SYSTEM_USER_EMAIL:system@internal.local}
+  password: ${PROD_SYSTEM_USER_PASSWORD:change-me}
+  id: ${PROD_SYSTEM_USER_ID:00000000-0000-0000-0000-000000000000}
+
 spring:
   application:
     name: auth-service

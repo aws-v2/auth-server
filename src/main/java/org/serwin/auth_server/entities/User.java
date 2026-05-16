@@ -21,7 +21,7 @@ import org.serwin.auth_server.enums.Role;
 public class User {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.UUID)
+    // @GeneratedValue(strategy = GenerationType.UUID)
     private UUID id;
 
 @Column(unique = true, nullable = false)
