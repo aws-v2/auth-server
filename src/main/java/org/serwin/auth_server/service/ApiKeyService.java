@@ -54,51 +54,28 @@ public void debugSecret() {
         secret.substring(Math.max(0, secret.length() - 8))
     );
 }
-
-public String generateApiKey(String userId, CreateApiKeyRequest request) {
-debugSecret();
-
+ public String generateApiKey(String userId, CreateApiKeyRequest request) {
+    debugSecret();
     try {
-
         User user = userRepository.findById(UUID.fromString(userId))
                 .orElseThrow(() -> new RuntimeException("User not found"));
 
-        // unique random value
-        String keyId = UUID.randomUUID()
-                .toString()
-                .replace("-", "");
+        String keyId = UUID.randomUUID().toString().replace("-", "");
 
-        // payload
-        String payload = userId + ":" + keyId;
+        // payload: userId:keyId:role
+        String payload = userId + ":" + keyId + ":" + user.getRole();
 
-        // encode payload
         String encodedPayload = Base64.getUrlEncoder()
                 .withoutPadding()
-                .encodeToString(
-                        payload.getBytes(StandardCharsets.UTF_8)
-                );
+                .encodeToString(payload.getBytes(StandardCharsets.UTF_8));
 
-        // sign encoded payload
         String signature = hmacSign(encodedPayload);
 
-        /*
-         * FINAL API KEY FORMAT:
-         *
-         * ak_<payload>.<signature>
-         *
-         * example:
-         * ak_YWJjMTIzOmRlZjQ1Ng.xxxxxxxx
-         */
         String apiKeyValue = "ak_" + encodedPayload + "." + signature;
 
-        // save api key metadata
         ApiKey apiKey = new ApiKey();
-
         apiKey.setUser(user);
-
-        // store the full api key
         apiKey.setApiKey(apiKeyValue);
-
         apiKey.setName(request.getName());
         apiKey.setEnabled(true);
         apiKey.setCreatedAt(LocalDateTime.now());
@@ -108,13 +85,8 @@ debugSecret();
         return apiKeyValue;
 
     } catch (Exception e) {
-
         log.error("Failed to generate API key", e);
-
-        throw new RuntimeException(
-                "Failed to generate API key",
-                e
-        );
+        throw new RuntimeException("Failed to generate API key", e);
     }
 }
 private String hmacSign(String data) {
