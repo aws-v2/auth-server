@@ -43,7 +43,7 @@ spring:
     password: ${STAGING_DATASOURCE_PASSWORD:postgres-staging-password}
     driver-class-name: org.postgresql.Driver
     username: ${STAGING_DATASOURCE_USERNAME:postgres-staging-user}
-    url: ${STAGING_DATASOURCE_URL:jdbc:postgresql://postgres-staging:5432/auth_db}
+    url: ${STAGING_DATASOURCE_URL:jdbc:postgresql://postgres-staging:5432/auth_db2}
     hikari:
       maximum-pool-size: 20
       minimum-idle: 5

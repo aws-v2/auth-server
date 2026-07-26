@@ -1,10 +1,11 @@
 package org.serwin.auth_server.util;
 
 import org.serwin.auth_server.enums.Role;
+import org.serwin.auth_server.messaging.NatsService;
+import org.serwin.auth_server.dto.events_dto.SystemUserCreatedEventS3;
 import org.serwin.auth_server.entities.User;
 import org.serwin.auth_server.repository.UserRepository;
-import org.serwin.auth_server.dto.SystemUserCreatedEventS3;
-import org.serwin.auth_server.service.NatsService;
+
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.boot.ApplicationArguments;
@@ -64,7 +65,7 @@ public class SystemUserInitializer implements ApplicationRunner {
                     .created_at(java.time.OffsetDateTime.now().toString())
                     .build();
 
-            natsService.publish("s3.task", "system_user_created", s3Event);
+            natsService.publish("s3.task.system_user_created", s3Event);
             log.info("[system-user] published S3 bucket creation event for tenant: {}", user.getId());
 
         } catch (Exception e) {

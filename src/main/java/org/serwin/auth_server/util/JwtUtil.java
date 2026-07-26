@@ -85,4 +85,8 @@ public class JwtUtil {
             throw new RuntimeException("Error hashing token", e);
         }
     }
+
+    public String generateTokenWithClaims(String userId, java.util.Map<String, Object> extraClaims) {
+        return createToken(extraClaims, userId.toString());
+    }
 }

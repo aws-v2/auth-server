@@ -96,7 +96,7 @@ jobs:
               --env PROD_NATS_PASSWORD=nats-prod-password \
               --env PROD_DATASOURCE_PASSWORD=postgres-prod-password \
               --env PROD_DATASOURCE_USERNAME=postgres-prod-user \
-              --env PROD_DATASOURCE_URL=jdbc:postgresql://postgres-prod:5432/auth_db \
+              --env PROD_DATASOURCE_URL=jdbc:postgresql://postgres-prod:5432/auth_db2 \
               --env PROD_MAIL_HOST=smtp.gmail.com \
               --env PROD_MAIL_PORT=587 \
               --env PROD_MAIL_USERNAME=emqarani@gmail.com \

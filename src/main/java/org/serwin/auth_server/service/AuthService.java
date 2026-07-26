@@ -3,10 +3,19 @@ package org.serwin.auth_server.service;
 import com.google.zxing.WriterException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.serwin.auth_server.dto.*;
+// import org.serwin.auth_server.dto.;
+import org.serwin.auth_server.dto.auth_dto.ForgotPasswordRequest;
+import org.serwin.auth_server.dto.auth_dto.LoginRequest;
+import org.serwin.auth_server.dto.auth_dto.LoginResponse;
+import org.serwin.auth_server.dto.auth_dto.MfaVerifyRequest;
+import org.serwin.auth_server.dto.auth_dto.RegisterRequest;
+import org.serwin.auth_server.dto.auth_dto.ResetPasswordRequest;
+import org.serwin.auth_server.dto.auth_dto.UserDto;
+import org.serwin.auth_server.dto.events_dto.TenantCreatedEvent;
 import org.serwin.auth_server.entities.PasswordResetToken;
 import org.serwin.auth_server.entities.User;
 import org.serwin.auth_server.enums.Role;
+import org.serwin.auth_server.messaging.NatsService;
 import org.serwin.auth_server.repository.PasswordResetTokenRepository;
 import org.serwin.auth_server.repository.UserRepository;
 import org.serwin.auth_server.util.HeaderUtils;
@@ -21,13 +30,7 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Objects;
 import java.util.UUID;
-import java.nio.charset.StandardCharsets;
-import java.security.MessageDigest;
-import java.time.Instant;
-import java.util.Base64;
 
-import javax.crypto.Mac;
-import javax.crypto.spec.SecretKeySpec;
 @Service
 @RequiredArgsConstructor
 @Slf4j
@@ -48,6 +51,10 @@ public class AuthService {
     private String activeProfile;
     @Value("${jwt.secret:404E635266556A586E3272357538782F413F4428472B4B6250645367566B5970}")
     private String secret;
+
+
+    @Value("${nats.prefix}")
+    private String natsPrefix;
 
     public LoginResponse register(RegisterRequest request) {
         log.debug("Processing registration for email: {}", request.getEmail());
@@ -98,7 +105,7 @@ public class AuthService {
                     .build();
  
             // 2. Publish UserRegistered event (standard/example)
-            natsService.publish("user", "registered", Map.of(
+            natsService.publish(String.format("%s.auth.user.registered", natsPrefix), Map.of(
                     "tenant_name", user.getEmail().split("@")[0],
                     "tenant_email", user.getEmail(),
                     "tenant_id", user.getId().toString(),

@@ -1,9 +1,12 @@
 package org.serwin.auth_server.service;
 
 import java.io.InputStream;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Map;
 
-import org.serwin.auth_server.dto.DocResponse;
+import org.serwin.auth_server.dto.docs_dto.DocResponse;
+import org.serwin.auth_server.dto.docs_dto.DocsManifestResponse;
 import org.serwin.auth_server.enums.DocType;
 import org.springframework.stereotype.Service;
 import org.yaml.snakeyaml.Yaml;
@@ -22,8 +25,12 @@ public class DocsService {
     // =========================
     // MANIFEST LOADER
     // =========================
-    public Object getManifest(DocType type) {
+    public List<DocsManifestResponse> getManifest(DocType type) {
+        String role = "USER";
+        type = DocType.PUBLIC;
         String path = resolvePath(type) + "manifest.json";
+
+        List<DocsManifestResponse> combinedDocs = new ArrayList<DocsManifestResponse>();
 
         try (InputStream is = getClass().getClassLoader()
                 .getResourceAsStream(path)) {
@@ -32,11 +39,33 @@ public class DocsService {
                 throw new RuntimeException("Manifest not found: " + type);
             }
 
-            return objectMapper.readValue(is, Object.class);
+            DocsManifestResponse publicDocs = objectMapper.convertValue(is, DocsManifestResponse.class);
+            combinedDocs.add(publicDocs);
 
         } catch (Exception e) {
             throw new RuntimeException("Failed to load manifest for: " + type, e);
         }
+
+        if (role == "ADMIN" || role == "STAFF" || role == "SYSTEM" || role == "XXX") {
+            path = resolvePath(DocType.INTERNAL) + "manifest.json";
+
+            try (InputStream is = getClass().getClassLoader()
+                    .getResourceAsStream(path)) {
+
+                if (is == null) {
+                    throw new RuntimeException("Manifest not found: " + type);
+                }
+
+                DocsManifestResponse internalDocs = objectMapper.convertValue(is, DocsManifestResponse.class);
+                combinedDocs.add(internalDocs);
+
+            } catch (Exception e) {
+                throw new RuntimeException("Failed to load manifest for: " + type, e);
+            }
+        }
+
+        return combinedDocs;
+
     }
 
     // =========================

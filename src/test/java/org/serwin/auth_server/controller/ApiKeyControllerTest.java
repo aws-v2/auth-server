@@ -5,10 +5,10 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.serwin.auth_server.config.SecurityConfig;
-import org.serwin.auth_server.dto.ApiKeyResponse;
-import org.serwin.auth_server.dto.CreateApiKeyRequest;
+import org.serwin.auth_server.dto.apikey_dto.ApiKeyResponse;
+import org.serwin.auth_server.dto.apikey_dto.CreateApiKeyRequest;
+import org.serwin.auth_server.messaging.NatsService;
 import org.serwin.auth_server.service.ApiKeyService;
-import org.serwin.auth_server.service.NatsService;
 import org.serwin.auth_server.util.JwtUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
@@ -266,7 +266,7 @@ class ApiKeyControllerTest {
                     .andExpect(status().isOk())
                     .andExpect(jsonPath("$.message").value("API key revoked"));
 
-            verify(natsService).publish(eq("apikey"), eq("revoked"), any());
+            verify(natsService).publish(eq("apikey"), any());
         }
 
         @Test
@@ -280,7 +280,6 @@ class ApiKeyControllerTest {
                     .andExpect(status().isOk());
 
             verify(natsService).publish(
-                    eq("apikey"),
                     eq("revoked"),
                     argThat(payload -> {
                         @SuppressWarnings("unchecked")

@@ -3,9 +3,18 @@ package org.serwin.auth_server.controller;
 import com.google.zxing.WriterException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.serwin.auth_server.dto.*;
+import org.serwin.auth_server.dto.auth_dto.ApiResponse;
+import org.serwin.auth_server.dto.auth_dto.ForgotPasswordRequest;
+import org.serwin.auth_server.dto.auth_dto.LoginRequest;
+import org.serwin.auth_server.dto.auth_dto.LoginResponse;
+import org.serwin.auth_server.dto.auth_dto.MfaVerifyRequest;
+import org.serwin.auth_server.dto.auth_dto.RegisterRequest;
+import org.serwin.auth_server.dto.auth_dto.ResetPasswordRequest;
+import org.serwin.auth_server.dto.auth_dto.UserDto;
+import org.serwin.auth_server.dto.payment_dto.PaymentRequest;
+import org.serwin.auth_server.dto.payment_dto.PaymentVerificationResponse;
+import org.serwin.auth_server.messaging.NatsService;
 import org.serwin.auth_server.service.AuthService;
-import org.serwin.auth_server.service.NatsService;
 import org.serwin.auth_server.service.TokenBlacklistService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -184,12 +193,7 @@ public class AuthController {
 
             tokenBlacklistService.blacklistToken(token, email, "User logout");
 
-            // Publish event: token.blacklisted
-            natsService.publish("token", "blacklisted", Map.of(
-                    "email", email,
-                    "tokenHash", tokenBlacklistService.hashToken(token),
-                    "reason", "User logout",
-                    "timestamp", java.time.LocalDateTime.now().toString()));
+   
 
             auditLog.info("USER_LOGOUT - email={}", email);
             log.info("User logged out successfully: {}", email);

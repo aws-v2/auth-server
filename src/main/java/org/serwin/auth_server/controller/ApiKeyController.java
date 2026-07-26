@@ -2,20 +2,18 @@ package org.serwin.auth_server.controller;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.serwin.auth_server.dto.ApiKeyResponse;
-import org.serwin.auth_server.dto.ApiResponse;
-import org.serwin.auth_server.dto.CreateApiKeyRequest;
+
+import org.serwin.auth_server.dto.apikey_dto.ApiKeyResponse;
+import org.serwin.auth_server.dto.apikey_dto.CreateApiKeyRequest;
+import org.serwin.auth_server.dto.auth_dto.ApiResponse;
 import org.serwin.auth_server.service.ApiKeyService;
-import org.serwin.auth_server.service.NatsService;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
 
-import java.time.LocalDateTime;
 import java.util.List;
-import java.util.Map;
 import java.util.UUID;
 
 @RestController
@@ -23,9 +21,7 @@ import java.util.UUID;
 @RequiredArgsConstructor
 @Slf4j
 public class ApiKeyController {
-
     private final ApiKeyService apiKeyService;
-    private final NatsService natsService;
 
     @PostMapping("{userId}")
     public ResponseEntity<ApiResponse<String>> createApiKey(@PathVariable(value = "userId") String userId ,
@@ -35,16 +31,7 @@ public class ApiKeyController {
 
         try {
             String email = getCurrentUserEmail();
-
-            // generate stateless signed API key
             String apiKey = apiKeyService.generateApiKey(userId,request);
-
-            // publish event (no DB dependency)
-            natsService.publish("apikey", "created", Map.of(
-                    "email", email,
-                    "keyName", request.getName(),
-                    "apiKey", apiKey,
-                    "timestamp", LocalDateTime.now().toString()));
 
             log.info("API key created successfully for user: {}", email);
 
@@ -84,13 +71,6 @@ public class ApiKeyController {
             String email = getCurrentUserEmail();
             String apiKeyStr = apiKeyService.revokeApiKey(UUID.fromString(keyId), email);
 
-            // Publish event: apikey.revoked
-            natsService.publish("apikey", "revoked", Map.of(
-                    "email", email,
-                    "apiKey", apiKeyStr,
-                    "keyId", keyId,
-                    "timestamp", LocalDateTime.now().toString()));
-
             log.info("API key revoked successfully: {}", apiKeyStr);
             return ResponseEntity.ok(ApiResponse.success("API key revoked successfully", null));
         } catch (Exception e) {
@@ -99,6 +79,9 @@ public class ApiKeyController {
                     .body(ApiResponse.error(HttpStatus.BAD_REQUEST.value(), e.getMessage()));
         }
     }
+
+
+
 
     private String getCurrentUserEmail() {
         Authentication authentication = SecurityContextHolder.getContext()

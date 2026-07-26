@@ -12,8 +12,10 @@ import org.mockito.ArgumentCaptor;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
-import org.serwin.auth_server.dto.AccessKeyResolveRequest;
-import org.serwin.auth_server.dto.AccessKeyResolveResponse;
+import org.serwin.auth_server.dto.accesskey_dto.AccessKeyResolveRequest;
+import org.serwin.auth_server.dto.accesskey_dto.AccessKeyResolveResponse;
+import org.serwin.auth_server.messaging.NatsListener;
+import org.serwin.auth_server.messaging.NatsService;
 import org.springframework.test.util.ReflectionTestUtils;
 
 import static org.assertj.core.api.Assertions.assertThat;
