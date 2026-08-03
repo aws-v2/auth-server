@@ -1,22 +1,28 @@
 package org.serwin.auth_server.dto.docs_dto;
 
-import java.util.Map;
 
 public class DocResponse {
-
-    private Map<String, Object> metadata;
+    private Metadata metadata;
     private String content;
 
-    public DocResponse(Map<String, Object> metadata, String content) {
+    public DocResponse(Metadata metadata, String content) {
         this.metadata = metadata;
         this.content = content;
     }
 
-    public Map<String, Object> getMetadata() {
+    public Metadata getMetadata() {
         return metadata;
+    }
+
+    public void setMetadata(Metadata metadata) {
+        this.metadata = metadata;
     }
 
     public String getContent() {
         return content;
+    }
+
+    public void setContent(String content) {
+        this.content = content;
     }
 }

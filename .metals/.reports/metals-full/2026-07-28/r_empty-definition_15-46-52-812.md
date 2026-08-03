@@ -1,3 +1,14 @@
+error id: file://<HOME>/Documents/aws-v4/dev/Java/auth-server%20(copy)/src/main/java/org/serwin/auth_server/messaging/NatsListener.java:_empty_/InstanceTokenRequest#getInstanceId#
+file://<HOME>/Documents/aws-v4/dev/Java/auth-server%20(copy)/src/main/java/org/serwin/auth_server/messaging/NatsListener.java
+empty definition using pc, found symbol in pc: _empty_/InstanceTokenRequest#getInstanceId#
+empty definition using semanticdb
+empty definition using fallback
+non-local guesses:
+
+offset: 2945
+uri: file://<HOME>/Documents/aws-v4/dev/Java/auth-server%20(copy)/src/main/java/org/serwin/auth_server/messaging/NatsListener.java
+text:
+```scala
 package org.serwin.auth_server.messaging;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -43,10 +54,9 @@ public class NatsListener {
             return;
         }
 
-        // One shared dispatcher — each subject gets its own handler via
-        // subscribe(subject, handler)
-        dispatcher = conn.createDispatcher(
-                msg -> log.warn("[NATS] Received message on unhandled default subject={}", msg.getSubject()));
+        // One shared dispatcher — each subject gets its own handler via subscribe(subject, handler)
+        dispatcher = conn.createDispatcher(msg ->
+                log.warn("[NATS] Received message on unhandled default subject={}", msg.getSubject()));
 
         // Current listener: token generation
         addListener(subject("iam.token.generate"), this::handleTokenGenerate);
@@ -59,8 +69,7 @@ public class NatsListener {
 
     /**
      * Registers a handler for a subject on the shared dispatcher.
-     * Call this again (with a different subject/handler) to listen to more
-     * subjects.
+     * Call this again (with a different subject/handler) to listen to more subjects.
      */
     private void addListener(String subject, MessageHandler handler) {
         dispatcher.subscribe(subject, handler);
@@ -74,18 +83,12 @@ public class NatsListener {
     private void handleTokenGenerate(Message msg) {
         String subject = msg.getSubject();
         String replyTo = msg.getReplyTo();
-        byte[] messageData = msg.getData();
-
-        if (messageData.length > 0) {
-            log.info("[NATS] [REQUEST] the length of the message is {}",messageData.length);
-        }
 
         try {
-            Object reqObject = objectMapper.readValue(msg.getData(), Object.class);
             InstanceTokenRequest request = objectMapper.readValue(msg.getData(), InstanceTokenRequest.class);
 
-            log.info("[NATS] [REQUEST] subject={} user_id={} instance_id={} thisis the full request {}",
-                    subject, msg.getData().toString(), request.getInstanceID(), reqObject);
+            log.info("[NATS] [REQUEST] subject={} user_id={} instance_id={}",
+                    subject, request.getUserID(), request.getInsta@@nceId());
 
             String token = generateToken(request);
             InstanceTokenResponse response = new InstanceTokenResponse(token, null);
@@ -129,3 +132,9 @@ public class NatsListener {
         return jwtUtil.generateTokenWithClaims(request.getUserID(), extraClaims);
     }
 }
+```
+
+
+#### Short summary: 
+
+empty definition using pc, found symbol in pc: _empty_/InstanceTokenRequest#getInstanceId#

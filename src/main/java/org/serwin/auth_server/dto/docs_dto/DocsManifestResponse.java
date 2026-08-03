@@ -1,5 +1,4 @@
 package org.serwin.auth_server.dto.docs_dto;
-
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -28,25 +27,6 @@ public class DocsManifestResponse {
 class CategoriesMap {
     public String scope;
     public DocCategory[] categoriesMap;
-}
-
-@Data
-@AllArgsConstructor
-@NoArgsConstructor
-@Builder
-class DocCategory {
-    public String title;
-    public DocItem[] categoriesMap;
-}
-
-@Data
-@AllArgsConstructor
-@NoArgsConstructor
-@Builder
-class DocItem {
-    public String title;
-    public String slug;
-
 }
 
 // type DocManifest struct {

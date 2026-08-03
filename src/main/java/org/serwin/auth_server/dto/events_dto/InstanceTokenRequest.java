@@ -10,8 +10,8 @@ import lombok.ToString;
 @NoArgsConstructor
 @ToString
 public class InstanceTokenRequest{
-        public String instanceId;
-        public String userId;
+        public String instanceID;
+        public String userID;
         public  String payload;
    
 }
