@@ -1,6 +1,6 @@
 package org.serwin.auth_server;
 
-import org.serwin.auth_server.service.NatsService;
+import org.serwin.auth_server.messaging.NatsService;
 import org.serwin.auth_server.service.RateLimitingService;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.mail.javamail.JavaMailSender;

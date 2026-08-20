@@ -5,9 +5,17 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.serwin.auth_server.config.SecurityConfig;
-import org.serwin.auth_server.dto.*;
+import org.serwin.auth_server.dto.auth_dto.ForgotPasswordRequest;
+import org.serwin.auth_server.dto.auth_dto.LoginRequest;
+import org.serwin.auth_server.dto.auth_dto.LoginResponse;
+import org.serwin.auth_server.dto.auth_dto.MfaVerifyRequest;
+import org.serwin.auth_server.dto.auth_dto.RegisterRequest;
+import org.serwin.auth_server.dto.auth_dto.ResetPasswordRequest;
+import org.serwin.auth_server.dto.auth_dto.UserDto;
+import org.serwin.auth_server.dto.payment_dto.PaymentRequest;
+import org.serwin.auth_server.dto.payment_dto.PaymentVerificationResponse;
+import org.serwin.auth_server.messaging.NatsService;
 import org.serwin.auth_server.service.AuthService;
-import org.serwin.auth_server.service.NatsService;
 import org.serwin.auth_server.service.TokenBlacklistService;
 import org.serwin.auth_server.util.JwtUtil;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -538,7 +546,7 @@ class AuthControllerTest {
                     .andExpect(jsonPath("$.message").value("Logged out successfully"));
 
             verify(tokenBlacklistService).blacklistToken(eq("my-valid-token"), eq("test@example.com"), anyString());
-            verify(natsService).publish(eq("token"), eq("blacklisted"), any());
+            verify(natsService).publish(eq("token"), any());
         }
 
         @Test

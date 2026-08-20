@@ -1,7 +1,7 @@
 package org.serwin.auth_server.config;
 
 import org.serwin.auth_server.filter.ClientAuthenticationFilter;
-import org.serwin.auth_server.filter.RateLimitFilter;
+// import org.serwin.auth_server.filter.RateLimitFilter;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -24,16 +24,17 @@ public class SecurityConfig {
 
     private final ClientAuthenticationFilter clientAuthFilter;
     private final JwtAuthenticationFilter jwtAuthFilter;
-    private final RateLimitFilter rateLimitFilter;
+//     private final RateLimitFilter rateLimitFilter;
     private final UserDetailsService userDetailsService;
 
-    public SecurityConfig(ClientAuthenticationFilter clientAuthFilter,
+    public SecurityConfig(
+            ClientAuthenticationFilter clientAuthFilter,
             JwtAuthenticationFilter jwtAuthFilter,
-            RateLimitFilter rateLimitFilter,
+        //     RateLimitFilter rateLimitFilter,
             @org.springframework.context.annotation.Lazy UserDetailsService userDetailsService) {
         this.clientAuthFilter = clientAuthFilter;
         this.jwtAuthFilter = jwtAuthFilter;
-        this.rateLimitFilter = rateLimitFilter;
+        // this.rateLimitFilter = rateLimitFilter;
         this.userDetailsService = userDetailsService;
     }
 
@@ -52,7 +53,7 @@ public class SecurityConfig {
                                 "/api/v1/auth/mfa/verify"))
                         .permitAll()
                         .requestMatchers(new org.springframework.security.web.util.matcher.AntPathRequestMatcher(
-                                "/api/v1/auth/docs/**"))
+                                "/api/v1/auth/docs"))
                         .permitAll()
 
                         .requestMatchers(new org.springframework.security.web.util.matcher.AntPathRequestMatcher(
@@ -61,20 +62,25 @@ public class SecurityConfig {
                         .requestMatchers(new org.springframework.security.web.util.matcher.AntPathRequestMatcher(
                                 "/api/v1/auth/reset-password"))
                         .permitAll()
+                          .requestMatchers(new org.springframework.security.web.util.matcher.AntPathRequestMatcher(
+                                "/api/v1/auth/health"))
+                        .permitAll()
                         .requestMatchers(new org.springframework.security.web.util.matcher.AntPathRequestMatcher(
                                 "/api/v1/auth/verify-email"))
                         .permitAll()
                         .requestMatchers(new org.springframework.security.web.util.matcher.AntPathRequestMatcher(
                                 "/api/v1/auth/resend-verification"))
                         .permitAll()
-                        .requestMatchers(
-                                new org.springframework.security.web.util.matcher.AntPathRequestMatcher("/actuator/**"))
+                        .requestMatchers(new org.springframework.security.web.util.matcher.AntPathRequestMatcher("/actuator/**"))
                         .permitAll()
+
+                        
+
                         .anyRequest().authenticated())
                 .sessionManagement(session -> session
                         .sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .authenticationProvider(authenticationProvider())
-                .addFilterBefore(rateLimitFilter, UsernamePasswordAuthenticationFilter.class)
+                // .addFilterBefore(rateLimitFilter, UsernamePasswordAuthenticationFilter.class)
                 .addFilterBefore(jwtAuthFilter, UsernamePasswordAuthenticationFilter.class)
                 .addFilterBefore(clientAuthFilter, UsernamePasswordAuthenticationFilter.class);
 

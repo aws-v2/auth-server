@@ -11,11 +11,11 @@ import java.util.UUID;
 
 @Repository
 public interface ApiKeyRepository extends JpaRepository<ApiKey, UUID> {
-    Optional<ApiKey> findByAccessKeyId(String accessKeyId);
+    Optional<ApiKey> findByApiKey(String apiKey);
 
     List<ApiKey> findByUserAndEnabledTrue(User user);
 
     List<ApiKey> findByUser(User user);
 
-    boolean existsByAccessKeyId(String accessKeyId);
+    boolean existsByApiKey(String apiKey);
 }

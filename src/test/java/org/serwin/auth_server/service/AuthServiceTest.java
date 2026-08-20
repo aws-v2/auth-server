@@ -9,9 +9,16 @@ import org.mockito.ArgumentCaptor;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
-import org.serwin.auth_server.dto.*;
+import org.serwin.auth_server.dto.auth_dto.ForgotPasswordRequest;
+import org.serwin.auth_server.dto.auth_dto.LoginRequest;
+import org.serwin.auth_server.dto.auth_dto.LoginResponse;
+import org.serwin.auth_server.dto.auth_dto.MfaVerifyRequest;
+import org.serwin.auth_server.dto.auth_dto.RegisterRequest;
+import org.serwin.auth_server.dto.auth_dto.ResetPasswordRequest;
+import org.serwin.auth_server.dto.auth_dto.UserDto;
 import org.serwin.auth_server.entities.PasswordResetToken;
 import org.serwin.auth_server.entities.User;
+import org.serwin.auth_server.messaging.NatsService;
 import org.serwin.auth_server.repository.PasswordResetTokenRepository;
 import org.serwin.auth_server.repository.UserRepository;
 import org.serwin.auth_server.util.JwtUtil;
@@ -149,7 +156,6 @@ class AuthServiceTest {
 
             verify(natsService).publish(
                     eq("user"),
-                    eq("registered"),
                     argThat(payload -> {
                         @SuppressWarnings("unchecked")
                         var map = (Map<String, Object>) payload;
@@ -181,7 +187,7 @@ class AuthServiceTest {
             when(jwtUtil.generateToken(any(), any(), any())).thenReturn("token");
             stubUserSave();
             doThrow(new RuntimeException("NATS down"))
-                    .when(natsService).publish(any(), any(), any());
+                    .when(natsService).publish(any(),  any());
 
             assertDoesNotThrow(() -> authService.register(registerRequest(EMAIL, PASSWORD, PASSWORD)));
         }

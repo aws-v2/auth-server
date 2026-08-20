@@ -9,16 +9,23 @@ frontend:
   url: ${DEV_FRONTEND_URL:http://localhost:5173}
 
 jwt:
-  secret: ${DEV_JWT_SECRET:404E635266556A586E3272357538782F413F4428472B4B6250645367566B5970404E635266556A586E3272357538782F413F4428472B4B6250645367566B5970}
+  secret: ${DEV_JWT_SECRET:404E635266556A586E3272357538782F413F4428472B4B6250645367566B5970}
   expiration: ${JWT_SECRET_EXPIRATION:86400000}
 
 nats:
   url: ${DEV_NATS_URL:nats://localhost:4222}
   username: ${DEV_NATS_USERNAME:auth-server}
   password: ${DEV_NATS_PASSWORD:auth-secret}
+  prefix: ${DEV_NATS_PREFIX:dev.v1}
+
 
 app:
   email-verification-enabled: ${DEV_EMAIL_VERIFICATION_ENABLED:false}
+
+system-user:
+  email: ${DEV_SYSTEM_USER_EMAIL:system@internal.local}
+  password: ${DEV_SYSTEM_USER_PASSWORD:change-me}
+  id: ${DEV_SYSTEM_USER_ID:00000000-0000-0000-0000-000000000000}
 
 spring:
   application:
@@ -39,7 +46,7 @@ spring:
     password: ${DEV_DATASOURCE_PASSWORD:root}
     driver-class-name: org.postgresql.Driver
     username: ${DEV_DATASOURCE_USERNAME:root}
-    url: ${DEV_DATASOURCE_URL:jdbc:postgresql://localhost:5432/auth_db}
+    url: ${DEV_DATASOURCE_URL:jdbc:postgresql://localhost:5432/auth_db2}
   mail:
     host: ${DEV_MAIL_HOST:smtp.gmail.com}
     port: ${DEV_MAIL_PORT:587}

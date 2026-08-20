@@ -48,6 +48,8 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
         jwt = authHeader.substring(7);
         try {
+            log.debug("JWT authentication attempt for user: on path: {}",  requestUri);
+
             userEmail = jwtUtil.extractUsername(jwt);
             log.debug("JWT authentication attempt for user: {} on path: {}", userEmail, requestUri);
 

@@ -1,7 +1,8 @@
 package org.serwin.auth_server.exception;
 
 import lombok.extern.slf4j.Slf4j;
-import org.serwin.auth_server.dto.ApiResponse;
+
+import org.serwin.auth_server.dto.auth_dto.ApiResponse;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.ExceptionHandler;

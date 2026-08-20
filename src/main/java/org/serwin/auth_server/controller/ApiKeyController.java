@@ -2,20 +2,18 @@ package org.serwin.auth_server.controller;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.serwin.auth_server.dto.ApiKeyResponse;
-import org.serwin.auth_server.dto.ApiResponse;
-import org.serwin.auth_server.dto.CreateApiKeyRequest;
+
+import org.serwin.auth_server.dto.apikey_dto.ApiKeyResponse;
+import org.serwin.auth_server.dto.apikey_dto.CreateApiKeyRequest;
+import org.serwin.auth_server.dto.auth_dto.ApiResponse;
 import org.serwin.auth_server.service.ApiKeyService;
-import org.serwin.auth_server.service.NatsService;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
 
-import java.time.LocalDateTime;
 import java.util.List;
-import java.util.Map;
 import java.util.UUID;
 
 @RestController
@@ -23,41 +21,41 @@ import java.util.UUID;
 @RequiredArgsConstructor
 @Slf4j
 public class ApiKeyController {
-
     private final ApiKeyService apiKeyService;
-    private final NatsService natsService;
 
-    @PostMapping
-    public ResponseEntity<ApiResponse<ApiKeyResponse>> createApiKey(@RequestBody CreateApiKeyRequest request) {
+    @PostMapping("{userId}")
+    public ResponseEntity<ApiResponse<String>> createApiKey(@PathVariable(value = "userId") String userId ,
+            @RequestBody CreateApiKeyRequest request) {
+
         log.info("API key creation request for name: {}", request.getName());
+
         try {
             String email = getCurrentUserEmail();
-            ApiKeyResponse response = apiKeyService.generateApiKey(email, request);
- 
-            // Publish event: apikey.created
-            natsService.publish("apikey", "created", Map.of(
-                    "email", email,
-                    "userId", response.getUserId(),
-                    "accessKeyId", response.getAccessKeyId(),
-                    "secretKeyHash", response.getSecretKeyHash(),
-                    "keyName", request.getName(),
-                    "timestamp", LocalDateTime.now().toString()));
- 
-            log.info("API key created successfully: {}", response.getAccessKeyId());
-            return ResponseEntity.ok(ApiResponse.success("API key created successfully", response));
+            String apiKey = apiKeyService.generateApiKey(userId,request);
+
+            log.info("API key created successfully for user: {}", email);
+
+            return ResponseEntity.ok(
+                    ApiResponse.success(
+                            "API key created successfully",
+                            apiKey));
+
         } catch (Exception e) {
+
             log.error("API key creation failed - Error: {}", e.getMessage());
+
             return ResponseEntity.status(HttpStatus.BAD_REQUEST)
-                    .body(ApiResponse.error(HttpStatus.BAD_REQUEST.value(), e.getMessage()));
+                    .body(ApiResponse.error(
+                            HttpStatus.BAD_REQUEST.value(),
+                            e.getMessage()));
         }
     }
 
-    @GetMapping
-    public ResponseEntity<ApiResponse<List<ApiKeyResponse>>> listApiKeys() {
+    @GetMapping("{userId}")
+    public ResponseEntity<ApiResponse<List<ApiKeyResponse>>> listApiKeys(@PathVariable(value = "userId") String userId) {
         try {
-            String email = getCurrentUserEmail();
-            log.debug("Listing API keys for user: {}", email);
-            List<ApiKeyResponse> keys = apiKeyService.listUserApiKeys(email);
+            log.debug("Listing API keys for user: {}", userId);
+            List<ApiKeyResponse> keys = apiKeyService.listUserApiKeys(userId);
             return ResponseEntity.ok(ApiResponse.success(keys));
         } catch (Exception e) {
             log.error("Failed to list API keys - Error: {}", e.getMessage());
@@ -71,16 +69,9 @@ public class ApiKeyController {
         log.info("API key revocation request for keyId: {}", keyId);
         try {
             String email = getCurrentUserEmail();
-            String accessKeyId = apiKeyService.revokeApiKey(UUID.fromString(keyId), email);
- 
-            // Publish event: apikey.revoked
-            natsService.publish("apikey", "revoked", Map.of(
-                    "email", email,
-                    "accessKeyId", accessKeyId,
-                    "keyId", keyId,
-                    "timestamp", LocalDateTime.now().toString()));
- 
-            log.info("API key revoked successfully: {}", accessKeyId);
+            String apiKeyStr = apiKeyService.revokeApiKey(UUID.fromString(keyId), email);
+
+            log.info("API key revoked successfully: {}", apiKeyStr);
             return ResponseEntity.ok(ApiResponse.success("API key revoked successfully", null));
         } catch (Exception e) {
             log.error("API key revocation failed for keyId: {} - Error: {}", keyId, e.getMessage());
@@ -88,6 +79,9 @@ public class ApiKeyController {
                     .body(ApiResponse.error(HttpStatus.BAD_REQUEST.value(), e.getMessage()));
         }
     }
+
+
+
 
     private String getCurrentUserEmail() {
         Authentication authentication = SecurityContextHolder.getContext()

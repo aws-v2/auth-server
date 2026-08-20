@@ -12,8 +12,10 @@ import org.mockito.ArgumentCaptor;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
-import org.serwin.auth_server.dto.AccessKeyResolveRequest;
-import org.serwin.auth_server.dto.AccessKeyResolveResponse;
+import org.serwin.auth_server.dto.accesskey_dto.AccessKeyResolveRequest;
+import org.serwin.auth_server.dto.accesskey_dto.AccessKeyResolveResponse;
+import org.serwin.auth_server.messaging.NatsListener;
+import org.serwin.auth_server.messaging.NatsService;
 import org.springframework.test.util.ReflectionTestUtils;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -151,7 +153,7 @@ class NatsListenerTest {
         @Test
         void validMessage_resolvesApiKeyAndReplies() throws Exception {
             AccessKeyResolveRequest request = new AccessKeyResolveRequest();
-            request.setAccessKeyId("AKIA-TEST");
+            request.setApiKey("AKIA-TEST");
 
             AccessKeyResolveResponse response = AccessKeyResolveResponse.builder()
                     .userId("user-123")
@@ -180,7 +182,7 @@ class NatsListenerTest {
         @Test
         void validMessage_publishesResponseToReplyToSubject() throws Exception {
             AccessKeyResolveRequest request = new AccessKeyResolveRequest();
-            request.setAccessKeyId("AKIA-XYZ");
+            request.setApiKey("AKIA-XYZ");
 
             AccessKeyResolveResponse response = AccessKeyResolveResponse.builder().build();
             byte[] raw = "{}".getBytes();
@@ -200,9 +202,9 @@ class NatsListenerTest {
         }
 
         @Test
-        void validMessage_callsResolveApiKeyWithCorrectAccessKeyId() throws Exception {
+        void validMessage_callsResolveApiKeyWithCorrectApiKey() throws Exception {
             AccessKeyResolveRequest request = new AccessKeyResolveRequest();
-            request.setAccessKeyId("AKIA-SPECIFIC");
+            request.setApiKey("AKIA-SPECIFIC");
 
             Message message = mock(Message.class);
             when(message.getData()).thenReturn(new byte[0]);
@@ -255,7 +257,7 @@ class NatsListenerTest {
         @Test
         void apiKeyServiceThrows_doesNotThrow() throws Exception {
             AccessKeyResolveRequest request = new AccessKeyResolveRequest();
-            request.setAccessKeyId("AKIA-BAD");
+            request.setApiKey("AKIA-BAD");
 
             Message message = mock(Message.class);
             when(message.getData()).thenReturn(new byte[0]);
@@ -271,7 +273,7 @@ class NatsListenerTest {
         @Test
         void apiKeyServiceThrows_doesNotPublishReply() throws Exception {
             AccessKeyResolveRequest request = new AccessKeyResolveRequest();
-            request.setAccessKeyId("AKIA-ERR");
+            request.setApiKey("AKIA-ERR");
 
             Message message = mock(Message.class);
             when(message.getData()).thenReturn(new byte[0]);
@@ -288,7 +290,7 @@ class NatsListenerTest {
         @Test
         void serializationFailure_doesNotThrow() throws Exception {
             AccessKeyResolveRequest request = new AccessKeyResolveRequest();
-            request.setAccessKeyId("AKIA-SER");
+            request.setApiKey("AKIA-SER");
 
             AccessKeyResolveResponse response = AccessKeyResolveResponse.builder().build();
 
@@ -307,7 +309,7 @@ class NatsListenerTest {
         @Test
         void serializationFailure_doesNotPublishReply() throws Exception {
             AccessKeyResolveRequest request = new AccessKeyResolveRequest();
-            request.setAccessKeyId("AKIA-SER2");
+            request.setApiKey("AKIA-SER2");
 
             AccessKeyResolveResponse response = AccessKeyResolveResponse.builder().build();
 
