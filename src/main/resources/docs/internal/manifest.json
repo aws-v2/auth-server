@@ -1,5 +1,5 @@
 {
-  "service": "sagemaker-service",
+  "service": "Auth-service",
   "version": "V1",
   "type": "internal-docs",
   "description": "Internal engineering documentation for the SageMaker service. Covers pipeline execution, VM orchestration, task scheduling, SDK design, artifact management, container runtime, deployment, and platform architecture.",

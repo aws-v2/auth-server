@@ -38,9 +38,15 @@ public class AuthController {
     private final NatsService natsService;
 
     private static final Logger auditLog = LoggerFactory.getLogger("AUDIT");
-
+   @GetMapping("/health")
+    public ResponseEntity<?> healthHandler() {
+        return ResponseEntity.ok(Map.of("ping", "pong"));
+    } 
     @PostMapping("/register")
     public ResponseEntity<ApiResponse<LoginResponse>> register(@RequestBody RegisterRequest request) {
+
+
+ 
         log.info("Registration attempt for email: {}", request.getEmail());
         try {
             LoginResponse response = authService.register(request);

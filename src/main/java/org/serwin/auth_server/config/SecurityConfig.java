@@ -53,7 +53,7 @@ public class SecurityConfig {
                                 "/api/v1/auth/mfa/verify"))
                         .permitAll()
                         .requestMatchers(new org.springframework.security.web.util.matcher.AntPathRequestMatcher(
-                                "/api/v1/auth/docs/**"))
+                                "/api/v1/auth/docs"))
                         .permitAll()
 
                         .requestMatchers(new org.springframework.security.web.util.matcher.AntPathRequestMatcher(
@@ -62,15 +62,20 @@ public class SecurityConfig {
                         .requestMatchers(new org.springframework.security.web.util.matcher.AntPathRequestMatcher(
                                 "/api/v1/auth/reset-password"))
                         .permitAll()
+                          .requestMatchers(new org.springframework.security.web.util.matcher.AntPathRequestMatcher(
+                                "/api/v1/auth/health"))
+                        .permitAll()
                         .requestMatchers(new org.springframework.security.web.util.matcher.AntPathRequestMatcher(
                                 "/api/v1/auth/verify-email"))
                         .permitAll()
                         .requestMatchers(new org.springframework.security.web.util.matcher.AntPathRequestMatcher(
                                 "/api/v1/auth/resend-verification"))
                         .permitAll()
-                        .requestMatchers(
-                                new org.springframework.security.web.util.matcher.AntPathRequestMatcher("/actuator/**"))
+                        .requestMatchers(new org.springframework.security.web.util.matcher.AntPathRequestMatcher("/actuator/**"))
                         .permitAll()
+
+                        
+
                         .anyRequest().authenticated())
                 .sessionManagement(session -> session
                         .sessionCreationPolicy(SessionCreationPolicy.STATELESS))

@@ -20,7 +20,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
-@RequestMapping("/api/v1/auth")
+@RequestMapping("/api/v1/auth/docs")
 public class PublicDocsController {
     @Autowired
     private JwtUtil jwtUtil;
@@ -31,18 +31,14 @@ public class PublicDocsController {
         this.docsService = docsService;
     }
 
-    @GetMapping("/health")
-    public ResponseEntity<?> healthHandler() {
-        return ResponseEntity.ok(Map.of("ping", "pong"));
-    }
 
-    @GetMapping("/docs")
+    @GetMapping
     public ResponseEntity<?> getManifest(
             @RequestHeader(value = "Authorization", required = false) Optional<String> token) {
         String role = "USER";
-        System.out.println("token not present ===>: " + token.get().strip().equals(token.get()));
+        // System.out.println("token not present ===>: " + token.get().strip().equals(token.get()));
 
-        role = jwtUtil.extractRole(token.get().split(" ")[1].strip());
+        // role = jwtUtil.extractRole(token.get().split(" ")[1].strip());
         if (token.isPresent() && !token.get().isBlank()) {
             String raw = token.get().trim();
             if (raw.regionMatches(true, 0, "Bearer ", 0, 7)) {
@@ -80,7 +76,7 @@ public class PublicDocsController {
         }
     }
 
-    @GetMapping("/docs/{slug}")
+    @GetMapping("/{slug}")
     public ResponseEntity<?> getDoc(@PathVariable String slug, @RequestHeader("X-User-Role") String role) {
 
         try {
